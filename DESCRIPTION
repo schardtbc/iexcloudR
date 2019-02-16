@@ -12,6 +12,11 @@ LazyData: true
 Suggests: 
     testthat
 Imports:
-    magrittr
+    magrittr,
+    dplyr,
+    glue,
+    httr,
+    tibble,
+    tidyr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
