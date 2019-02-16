@@ -4,7 +4,6 @@
 
 # iexcloudR
 
-[![CircleCI](https://circleci.com/gh/schardtbc/iexcloudR.svg?style=svg)](https://circleci.com/gh/schardtbc/iexcloud_api_wrapper)
 [![tested with testthat](https://img.shields.io/badge/tested_with-testthat-99424f.svg)](https://github.com/r-lib/testthat) 
 
 
@@ -17,7 +16,7 @@ This package is a companion to the NodeJS package [iexcloud-api-wrapper](https:/
 To install as a dependancy into your project at the R REPL command prompt
 
 ```r
-install.github("git+https://git@github.com/schardtbc/iexcloudR")
+install.github("schardtbc/iexcloudR")
 ```
 
 then in your .env file add the following keys
