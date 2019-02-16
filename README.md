@@ -9,7 +9,7 @@
 
 An R language wrapper for the new iexcloud market data API from IEX Group Inc. All data is returned dataframes (actually tibbles).
 
-This package is a companion to the NodeJS package [iexcloud-api-wrapper](https://github.com/schardtbc/iexcloud_api_wrapper) 
+This package is a companion to the NodeJS package [iexcloud_api_wrapper](https://github.com/schardtbc/iexcloud_api_wrapper) 
 
 ## Usage
 
