@@ -106,15 +106,15 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 | [ ] | IPO Calendar today-ipos | 500 | per iPO returned
 | [x] | Key Stats | 20 | per symbol
 | [ ] | Largest Trades | 1 | per trade returned
-| [ ] | List | 1 | per quote returned
-| [ ] | Logo | 1 | per logo
-| [ ] | Market Volume (U.S.) | 1 | per call
-| [ ] | News | 10 | per news item returned
-| [ ] | OHLC | 2 | per symbol
-| [ ] | Peers | 500 | per symbol
-| [ ] | Previous Day Prices | 2 per symbol
-| [ ] | Price | 1 | per symbol per call
-| [ ] | Price Target | 500 per symbol
+| [X] | List | 1 | per quote returned
+| [X] | Logo | 1 | per logo
+| [X] | Market Volume (U.S.) | 1 | per call
+| [X] | News | 10 | per news item returned
+| [X] | OHLC | 2 | per symbol
+| [X] | Peers | 500 | per symbol
+| [X] | Previous Day Prices | 2 per symbol
+| [X] | Price | 1 | per symbol per call
+| [X] | Price Target | 500 per symbol
 | [X] | Quote | 1 | per quote 
 | [ ] | Sector Performance | 1 | per sector
 | [ ] | Social Sentiment, daily | 100 | per date
@@ -125,20 +125,20 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 ### Alternative Data
 |     | Endpoint       | Message Units | per |
 |-----|----------------|---------------:|-----|
-| [ ] | News
+| [X] | News
 | [ ] | Crypto
 
 ### Reference Data
 |     | Endpoint       | Message Units | per |
 |-----|----------------|---------------:|-----|
-| [ ] | Symbols | 100 | per call |
-| [ ] | IEX Symbols | 0 | as in free
+| [X] | Symbols | 100 | per call |
+| [X] | IEX Symbols | 0 | as in free
 | [ ] | U.S. Exchanges | 1 | per call
 | [ ] | U.S. Holidays and Trading Days | 1 | per call
 | [ ] | Stock Tags
 | [ ] | Stock Collections
-| [ ] | Mutual Fund Symbols | 100 | per call
-| [ ] | OTC Symbols | 100 | per call
+| [X] | Mutual Fund Symbols | 100 | per call
+| [X] | OTC Symbols | 100 | per call
 | [ ] | Forex / Currency Symbols
 | [ ] | Options Symbols
 | [ ] | Commodities Symbols
