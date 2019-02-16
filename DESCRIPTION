@@ -1,0 +1,17 @@
+Package: iexcloudR
+Type: Package
+Title: Wrapper for iexcloud Market Data Api
+Version: 0.1.0
+Author: Bruce C. Schardt
+Maintainer: Bruce C. Schardt <schardt.bruce.curtis@gmail.com>
+Description: Complete interface to the iexcloud market data api from 
+    IEX Group Inc. The Investors Exchange. 
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    testthat
+Imports:
+    magrittr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1
