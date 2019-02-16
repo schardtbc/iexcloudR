@@ -20,5 +20,5 @@ a dataframe
 retrieve balance sheet for a symbol as dataframe
 }
 \examples{
-balance_sheet("AAPL",period = "quarter", lastN =4)
+balanceSheet("AAPL",period = "quarter", lastN =4)
 }

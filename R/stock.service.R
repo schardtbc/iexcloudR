@@ -8,7 +8,7 @@
 #' @return a dataframe
 #' @export
 #' @examples
-#' balance_sheet("AAPL",period = "quarter", lastN =4)
+#' balanceSheet("AAPL",period = "quarter", lastN =4)
 balanceSheet <- function (symbol,period = "quarter",lastN=1) {
   endpoint <- glue::glue('/stock/{symbol}/balance-sheet/{lastN}?period={period}');
   res <- iex(endpoint);
@@ -39,62 +39,8 @@ cashflowStatement <- function (symbol,period = "quarter",lastN=1) {
     dplyr::mutate_at(dplyr::vars(reportDate),dplyr::funs(as.Date(.)))
 };
 
-#' retrieve income statement for a symbol as dataframe
-#' @param symbol stock
-#' @param period (quarter) "annual" | "quarter"
-#' @param lastN (1) number of periods to report
-#' @return a dataframe
-#' @export
-#' @examples
-#' incomeStatement("AAPL",period = "quarter", lastN =4)
-incomeStatement <- function (symbol,period = "quarter",lastN=1) {
-  endpoint <- glue::glue('/stock/{symbol}/income/{lastN}?period={period}');
-  res = iex(endpoint);
-  data <- res$income
-  data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
-  tibble::as_tibble(do.call(rbind,data)) %>%
-    tibble::add_column(symbol = symbol,.before=1) %>%
-    tidyr::unnest() %>%
-    dplyr::mutate_at(dplyr::vars(reportDate),dplyr::funs(as.Date(.)))
-};
-
-#' retrieve earnings statement for a symbol as dataframe
-#' @param symbol stock symbol
-#' @param lastN (1) number of periods to report
-#' @return a dataframe
-#' @export
-#' @examples
-#' earnings("AAPL", lastN =4)
-earnings <- function (symbol, lastN=1) {
-  endpoint <- glue::glue('/stock/{symbol}/earnings/{lastN}/');
-  res = iex(endpoint);
-  data <- res$earnings
-  data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
-  tibble::as_tibble(do.call(rbind,data)) %>%
-    tibble::add_column(symbol = symbol,.before=1) %>%
-    tidyr::unnest();
-};
-
-#' retrieve financial statement for a symbol as dataframe
-#' @param symbol stock symbol
-#' @param lastN (1) number of periods to report
-#' @return a dataframe
-#' @export
-#' @examples
-#' financials("AAPL", lastN =4)
-financials <- function (symbol, lastN=1) {
-  endpoint <- glue::glue('/stock/{symbol}/financials/{lastN}/');
-  res = iex(endpoint);
-  data <- res$financials
-  data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
-  tibble::as_tibble(do.call(rbind,data)) %>%
-    tibble::add_column(symbol = symbol,.before=1) %>%
-    tidyr::unnest();
-};
-
 #' retrieve company detail for a symbol as dataframe
 #' @param symbol stock symbol
-
 #' @return a dataframe
 #' @export
 #' @examples
@@ -121,6 +67,23 @@ dividends <- function (symbol, timePeriod = "3m") {
     tidyr::unnest();
 };
 
+#' retrieve earnings statement for a symbol as dataframe
+#' @param symbol stock symbol
+#' @param lastN (1) number of periods to report
+#' @return a dataframe
+#' @export
+#' @examples
+#' earnings("AAPL", lastN =4)
+earnings <- function (symbol, lastN=1) {
+  endpoint <- glue::glue('/stock/{symbol}/earnings/{lastN}/');
+  res = iex(endpoint);
+  data <- res$earnings
+  data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  tibble::as_tibble(do.call(rbind,data)) %>%
+    tibble::add_column(symbol = symbol,.before=1) %>%
+    tidyr::unnest();
+};
+
 #' retrieve effective spread for a symbol as dataframe
 #' @param symbol stock symbol
 #' @return a dataframe
@@ -131,6 +94,40 @@ effectiveSpread <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/effective-spread');
   res = iex(endpoint);
   tibble::as_tibble(res)
+};
+
+#' retrieve estimates for a symbol as dataframe
+#' @param symbol stock symbol
+#' @param lastN (1) number of periods to report
+#' @return a dataframe
+#' @export
+#' @examples
+#' estimates("AAPL", lastN =4)
+estimates <- function (symbol, lastN=1) {
+  endpoint <- glue::glue('/stock/{symbol}/estimates/{lastN}/');
+  res = iex(endpoint);
+  data <- res$estimates;
+  data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  tibble::as_tibble(do.call(rbind,data)) %>%
+    tibble::add_column(symbol = symbol,.before=1) %>%
+    tidyr::unnest();
+};
+
+#' retrieve financial statement for a symbol as dataframe
+#' @param symbol stock symbol
+#' @param lastN (1) number of periods to report
+#' @return a dataframe
+#' @export
+#' @examples
+#' financials("AAPL", lastN =4)
+financials <- function (symbol, lastN=1) {
+  endpoint <- glue::glue('/stock/{symbol}/financials/{lastN}/');
+  res = iex(endpoint);
+  data <- res$financials
+  data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  tibble::as_tibble(do.call(rbind,data)) %>%
+    tibble::add_column(symbol = symbol,.before=1) %>%
+    tidyr::unnest();
 };
 
 #' retrieve history for a stock over chosen time-period as dataframe
@@ -147,16 +144,16 @@ effectiveSpread <- function (symbol) {
 #' @export
 #' @examples
 #' history("AAPL")
-history <- function (symbol,
-                        timePeriod = "1m",
-                        chartCloseOnly = FALSE,
-                        chartIEXOnly = FALSE,
-                        chartLastN = 0,
-                        chartInterval = 1,
-                        changeFromClose = FALSE,
-                        chartReset = FALSE,
-                        chartSimplify = FALSE,
-                        date = "") {
+historyFor <- function (symbol,
+                     timePeriod = "1m",
+                     chartCloseOnly = FALSE,
+                     chartIEXOnly = FALSE,
+                     chartLastN = 0,
+                     chartInterval = 1,
+                     changeFromClose = FALSE,
+                     chartReset = FALSE,
+                     chartSimplify = FALSE,
+                     date = "") {
   if (nchar(date)>0){
     timePeriod='date'
   }
@@ -184,11 +181,164 @@ history <- function (symbol,
     endpoint <- paste0(endpoint,'&chartSimplify=true');
   }
   res = iex(endpoint);
-   data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
-   tibble::as_tibble(do.call(rbind,data)) %>%
-     tibble::add_column(symbol = symbol,.before=1) %>%
-     tidyr::unnest() %>%
-     dplyr::mutate_at(dplyr::vars(date),dplyr::funs(as.Date(.)))
+  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  tibble::as_tibble(do.call(rbind,data)) %>%
+    tibble::add_column(symbol = symbol,.before=1) %>%
+    tidyr::unnest() %>%
+    dplyr::mutate_at(dplyr::vars(date),dplyr::funs(as.Date(.)))
+};
+
+#' retrieve listSymbols  as dataframe
+#' @param symbolType "symbols" | "iex" | "otc" | "mutual-fund" |
+#' @return a dataframe
+#' @export
+#' @examples
+#' symbols("iex")
+listSymbols <- function (symbolType) {
+  if (symbolType == 'symbols') {
+    endpoint = '/ref-data/symbols'
+  } else {
+    endpoint <- glue::glue('/ref-data/{symbolType}/symbols');
+  }
+  res = iex(endpoint);
+  tibble::as_tibble(do.call(rbind,data))
+};
+
+#' retrieve income statement for a symbol as dataframe
+#' @param symbol stock
+#' @param period (quarter) "annual" | "quarter"
+#' @param lastN (1) number of periods to report
+#' @return a dataframe
+#' @export
+#' @examples
+#' incomeStatement("AAPL",period = "quarter", lastN =4)
+incomeStatement <- function (symbol,period = "quarter",lastN=1) {
+  endpoint <- glue::glue('/stock/{symbol}/income/{lastN}?period={period}');
+  res = iex(endpoint);
+  data <- res$income
+  data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  tibble::as_tibble(do.call(rbind,data)) %>%
+    tibble::add_column(symbol = symbol,.before=1) %>%
+    tidyr::unnest() %>%
+    dplyr::mutate_at(dplyr::vars(reportDate),dplyr::funs(as.Date(.)))
+};
+
+#' retrieve keyStats detail for a symbol as dataframe
+#' @param symbol stock symbol
+#' @return a dataframe
+#' @export
+#' @examples
+#' keyStats("AAPL")
+keyStats <- function (symbol) {
+  endpoint <- glue::glue('/stock/{symbol}/stats');
+  res = iex(endpoint);
+  tibble::as_tibble(res)
+};
+
+#' retrieve quotes for symbols on defined lists as dataframe
+#' @param listType one of   | "mostactive" | "gainers" | "losers" | "iexvolume" | "iexpercent" | "infocus";
+#' @return a dataframe
+#' @export
+#' @examples
+#' listOf("mostactive")
+listOf <- function (listType = "mostactive") {
+  endpoint <- glue::glue('/stock/market/list/{listType}');
+  res = iex(endpoint);
+  tibble::as_tibble(do.call(rbind,res))
+};
+
+#' retrieve logo url for symbols on defined lists as string
+#' @param symbol a market symbol
+#' @return a string
+#' @export
+#' @examples
+#' logo("AAPL")
+logoFor <- function (symbol) {
+  endpoint <- glue::glue('/stock/{symbol}/logo');
+  iex(endpoint);
+};
+
+#' retrieve real time traded volume on U.S. markets.
+#' @return a dataframe
+#' @export
+#' @examples
+#' marketVolumn()
+marketVolume <- function () {
+  endpoint <- '/market';
+  res = iex(endpoint);
+  tibble::as_tibble(do.call(rbind,res)) %>%
+    tidyr::unnest();
+};
+
+#' retrieve real time traded volume on U.S. markets.
+#' @return subject "market" | symbol
+#' @export
+#' @examples
+#' newsFor('AAPL)
+newsFor <- function (subject,lastN = 10) {
+  if (subject == 'market'){
+    endpoint = "/market/news/last/{lastN}"
+  } else {
+    endpoiont = '/stock/{subject}/last/{lastN}'
+  }
+  res = iex(endpoint);
+  tibble::as_tibble(do.call(rbind,res)) %>%
+    tidyr::unnest();
+};
+
+#' retrieve the official open and close for a given symbol.
+#' @return  symbol a market symbol
+#' @export
+#' @examples
+#' ohlc('AAPL')
+ohlc <- function (symbol) {
+  endpoint = '/stock/{symbol}/ohlc'
+  res = iex(endpoint);
+};
+
+#' retrieves an array of peer symbols.
+#' @return  symbol a market symbol
+#' @export
+#' @examples
+#' peers('AAPL')
+peersOf <- function (symbol) {
+  endpoint = '/stock/{symbol}/peers'
+  res = iex(endpoint);
+};
+
+#' retrieve previous day adjusted price data for one or more stocks
+#' @param symbol stock symbol
+#' @return a dataframe
+#' @export
+#' @examples
+#' previousDay("AAPL")
+previousDay <- function (symbol) {
+  endpoint <- glue::glue('/stock/{symbol}/previous');
+  res = iex(endpoint);
+  tibble::as_tibble(res)
+};
+
+#' retrieve current adjusted price data for one or more stocks
+#' @param symbol stock symbol
+#' @return a number
+#' @export
+#' @examples
+#' priceOf("AAPL")
+priceOf <- function (symbol) {
+  endpoint <- glue::glue('/stock/{symbol}/price');
+  iex(endpoint);
+};
+
+#' retrieve the latest avg, high, and low analyst price target for a symbol.
+#' @param symbol stock symbol
+#' @return a dataframe
+#' @export
+#' @examples
+#' priceTarget("AAPL")
+priveTarget <- function (symbol) {
+  endpoint <- glue::glue('/stock/{symbol}/price-target');
+  res = iex(endpoint);
+  tibble::as_tibble(res)
 };
 
 #' retrieve quote detail for a symbol as dataframe
@@ -196,11 +346,9 @@ history <- function (symbol,
 #' @return a dataframe
 #' @export
 #' @examples
-#' getQuote("AAPL")
-getQuote <- function (symbol) {
+#' quoteFor("AAPL")
+quoteFor <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/quote');
   res = iex(endpoint);
   tibble::as_tibble(res)
 };
-
-
