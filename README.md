@@ -38,7 +38,7 @@ To test that everything installed correctly and the .env file is properly setup 
 ```r
 library(iexcloudR)
 
-history("AAPL")
+historyFor("AAPL")
 ```
 
 ## About iexcloud
