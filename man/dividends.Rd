@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{dividends}
 \alias{dividends}
-\title{retrieve dividends detail for a symbol as dataframe}
+\title{Retrieve dividends detail for a symbol as dataframe}
 \usage{
 dividends(symbol, timePeriod = "3m")
 }
@@ -15,7 +15,10 @@ dividends(symbol, timePeriod = "3m")
 a dataframe
 }
 \description{
-retrieve dividends detail for a symbol as dataframe
+Data Weighting: 10 message unit per period returned
+}
+\details{
+Data Schedule: Updated at 9am UTC every day
 }
 \examples{
 dividends("AAPL")

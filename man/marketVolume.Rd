@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{marketVolume}
 \alias{marketVolume}
-\title{retrieve real time traded volume on U.S. markets.}
+\title{Retrieve real time traded volume on U.S. markets.}
 \usage{
 marketVolume()
 }
@@ -10,7 +10,7 @@ marketVolume()
 a dataframe
 }
 \description{
-retrieve real time traded volume on U.S. markets.
+Retrieve real time traded volume on U.S. markets.
 }
 \examples{
 marketVolumn()

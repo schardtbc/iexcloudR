@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{keyStats}
 \alias{keyStats}
-\title{retrieve keyStats detail for a symbol as dataframe}
+\title{Retrieve keyStats detail for a symbol as dataframe}
 \usage{
 keyStats(symbol)
 }
@@ -13,7 +13,7 @@ keyStats(symbol)
 a dataframe
 }
 \description{
-retrieve keyStats detail for a symbol as dataframe
+Data Weighting: 20 message units per call per symbol
 }
 \examples{
 keyStats("AAPL")

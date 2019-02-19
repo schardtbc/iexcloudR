@@ -7,7 +7,8 @@
 iexRaw(endpoint)
 }
 \arguments{
-\item{endpoint}{a string which will form the variable are of the endpoint URL}
+\item{endpoint}{a string which will form the variable are of the endpoint URL
+#' @return raw response object}
 }
 \description{
 Perform a get request to an endpoint on the iexcloud server

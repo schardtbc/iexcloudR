@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{historyFor}
 \alias{historyFor}
-\title{retrieve history for a stock over chosen time-period as dataframe}
+\title{Retrieve history for a stock over chosen time-period as dataframe}
 \usage{
 historyFor(symbol, timePeriod = "1m", chartCloseOnly = FALSE,
   chartIEXOnly = FALSE, chartLastN = 0, chartInterval = 1,
@@ -22,17 +22,30 @@ historyFor(symbol, timePeriod = "1m", chartCloseOnly = FALSE,
 
 \item{chartInterval}{= 1,If passed, chart data will return every Nth element as defined by chartInterval}
 
-\item{changeFromClose}{= FALSE,}
+\item{changeFromClose}{= FALSE, If true, changeOverTime and marketChangeOverTime will be relative to previous day close instead of the first value.}
 
 \item{chartReset}{= FALSE, If true, 1d chart will reset at midnight instead of the default behavior of 9:30am ET.}
 
 \item{chartSimplify}{= FALSE, If true, runs a polyline simplification using the Douglas-Peucker algorithm. This is useful if plotting sparkline charts.}
+
+\item{date}{as "YYYY-MM-DD"| "YYYYMMDD" | class(date) == "Date"}
 }
 \value{
 a dataframe
 }
 \description{
-retrieve history for a stock over chosen time-period as dataframe
+Data Weighting:
+}
+\details{
+\itemize{
+\item Adjusted + Unadjusted data: 10 message units per symbol per time interval returned (Excluding 1d)
+Example: If you query for AAPL 5 day, it will return 5 days of prices for AAPL for a total of 50.
+\item Adjusted close only data (chartCloseOnly=TRUE) 2 mu per symbol per time interval returned (Excluding 1d)
+\item Intraday minute bar data: 1 mu per symbol per time interval for 1d range up to a max of 50
+Example: If you query for AAPL 1d at 11:00am, it will return 90 minutes of data for a total of 50.
+\item IEX Only intraday minute bar data (chartIEXOnly=TRUE): 0 mu (as in free)
+This will only return IEX data with keys minute, high, low, average, volume, notional, and numberOfTrades
+}
 }
 \examples{
 history("AAPL")

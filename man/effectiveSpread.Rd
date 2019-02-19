@@ -13,7 +13,18 @@ effectiveSpread(symbol)
 a dataframe
 }
 \description{
-retrieve effective spread for a symbol as dataframe
+This returns an array of effective spread, eligible volume, and price improvement of a stock, by market.
+Unlike volume-by-venue, this will only return a venue if effective spread is not ‘N/A’.
+Values are sorted in descending order by effectiveSpread.
+Lower effectiveSpread and higher priceImprovement values are generally considered optimal.
+}
+\details{
+Effective spread is designed to measure marketable orders executed in relation to the market center’s
+quoted spread and takes into account hidden and midpoint liquidity available at each market center.
+Effective Spread is calculated by using eligible trade prices recorded to the consolidated tape
+and comparing those trade prices to the National Best Bid and Offer (“NBBO”) at the time of the execution.
+
+Data Weighting: 0 message units (as in free)
 }
 \examples{
 effectiveSpread("AAPL")

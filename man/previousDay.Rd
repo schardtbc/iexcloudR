@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{previousDay}
 \alias{previousDay}
-\title{retrieve previous day adjusted price data for one or more stocks}
+\title{Retrieve previous day adjusted price data for one or more stocks}
 \usage{
 previousDay(symbol)
 }
@@ -13,7 +13,7 @@ previousDay(symbol)
 a dataframe
 }
 \description{
-retrieve previous day adjusted price data for one or more stocks
+Data Weighting: 2 message units per symbol
 }
 \examples{
 previousDay("AAPL")

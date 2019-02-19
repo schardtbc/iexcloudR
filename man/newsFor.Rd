@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{newsFor}
 \alias{newsFor}
-\title{retrieve real time traded volume on U.S. markets.}
+\title{Retrieve real time traded volume on U.S. markets.}
 \usage{
 newsFor(subject, lastN = 10)
 }
@@ -10,5 +10,8 @@ newsFor(subject, lastN = 10)
 subject "market" | symbol
 }
 \description{
-retrieve real time traded volume on U.S. markets.
+Data Weight: 1 message unit per call
+}
+\examples{
+newsFor('AAPL')
 }

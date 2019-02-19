@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{listOf}
 \alias{listOf}
-\title{retrieve quotes for symbols on defined lists as dataframe}
+\title{Retrieve quotes for symbols on defined lists as dataframe}
 \usage{
 listOf(listType = "mostactive")
 }
@@ -13,7 +13,7 @@ listOf(listType = "mostactive")
 a dataframe
 }
 \description{
-retrieve quotes for symbols on defined lists as dataframe
+Retrieve quotes for symbols on defined lists as dataframe
 }
 \examples{
 listOf("mostactive")

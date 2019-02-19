@@ -13,7 +13,7 @@ company(symbol)
 a dataframe
 }
 \description{
-retrieve company detail for a symbol as dataframe
+Data Weighting: 1 message unit per symbol
 }
 \examples{
 company("AAPL")

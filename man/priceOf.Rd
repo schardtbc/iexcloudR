@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{priceOf}
 \alias{priceOf}
-\title{retrieve current adjusted price data for one or more stocks}
+\title{Retrieve A single number, being the IEX real time price, the 15 minute delayed market price, or the previous close price, is returned.}
 \usage{
 priceOf(symbol)
 }
@@ -13,7 +13,7 @@ priceOf(symbol)
 a number
 }
 \description{
-retrieve current adjusted price data for one or more stocks
+Data Weighting: 1 message unit per symbol
 }
 \examples{
 priceOf("AAPL")

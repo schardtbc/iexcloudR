@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{listSymbols}
 \alias{listSymbols}
-\title{retrieve listSymbols  as dataframe}
+\title{This call returns an array of symbols that IEX Cloud supports for API calls.}
 \usage{
 listSymbols(symbolType)
 }
@@ -13,7 +13,14 @@ listSymbols(symbolType)
 a dataframe
 }
 \description{
-retrieve listSymbols  as dataframe
+Data Weighting:
+\itemize{
+\item symbols, otc, mutual-fund: 100 message units per call
+\item iex: free;
+This call returns an array of symbols the Investors Exchange supports for trading.
+This list is updated daily as of 7:45 a.m. ET. Symbols may be added or removed by
+the Investors Exchange after the list was produced.
+}
 }
 \examples{
 symbols("iex")

@@ -2,7 +2,8 @@
 % Please edit documentation in R/stock.service.R
 \name{earnings}
 \alias{earnings}
-\title{retrieve earnings statement for a symbol as dataframe}
+\title{Retrieve Earnings data for a given company including the actual EPS, consensus, and fiscal period.
+Earnings are available quarterly (last 4 quarters) and annually (last 4 years).}
 \usage{
 earnings(symbol, lastN = 1)
 }
@@ -15,7 +16,10 @@ earnings(symbol, lastN = 1)
 a dataframe
 }
 \description{
-retrieve earnings statement for a symbol as dataframe
+Data Weighting: 1000 mesaage units per symbol per period
+}
+\details{
+Data Schedule: Updates at 9am, 11am, 12pm UTC every da
 }
 \examples{
 earnings("AAPL", lastN =4)

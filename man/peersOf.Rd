@@ -10,7 +10,7 @@ peersOf(symbol)
 symbol a market symbol
 }
 \description{
-retrieves an array of peer symbols.
+Data Weighting: 500 message units per call
 }
 \examples{
 peers('AAPL')

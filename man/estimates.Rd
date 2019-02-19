@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{estimates}
 \alias{estimates}
-\title{retrieve estimates for a symbol as dataframe}
+\title{Provides the latest consensus estimate for the next fiscal period}
 \usage{
 estimates(symbol, lastN = 1)
 }
@@ -15,7 +15,10 @@ estimates(symbol, lastN = 1)
 a dataframe
 }
 \description{
-retrieve estimates for a symbol as dataframe
+Data Weighting: 10000 message units per symbol per period
+}
+\details{
+Data Schedule: Updates at 9am, 11am, 12pm UTC every day
 }
 \examples{
 estimates("AAPL", lastN =4)

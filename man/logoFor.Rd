@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{logoFor}
 \alias{logoFor}
-\title{retrieve logo url for symbols on defined lists as string}
+\title{Retrieve logo url for symbols on defined lists as string}
 \usage{
 logoFor(symbol)
 }
@@ -13,7 +13,7 @@ logoFor(symbol)
 a string
 }
 \description{
-retrieve logo url for symbols on defined lists as string
+Retrieve logo url for symbols on defined lists as string
 }
 \examples{
 logo("AAPL")

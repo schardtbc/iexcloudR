@@ -13,7 +13,7 @@ quoteFor(symbol)
 a dataframe
 }
 \description{
-retrieve quote detail for a symbol as dataframe
+Data Weighting: 1 per quote called or streamed
 }
 \examples{
 quoteFor("AAPL")

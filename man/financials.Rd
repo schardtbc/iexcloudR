@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{financials}
 \alias{financials}
-\title{retrieve financial statement for a symbol as dataframe}
+\title{Pulls income statement, balance sheet, and cash flow data from the most recent reported quarter.}
 \usage{
 financials(symbol, lastN = 1)
 }
@@ -15,7 +15,7 @@ financials(symbol, lastN = 1)
 a dataframe
 }
 \description{
-retrieve financial statement for a symbol as dataframe
+Data Weighting: 5000 message units per symbol per period
 }
 \examples{
 financials("AAPL", lastN =4)

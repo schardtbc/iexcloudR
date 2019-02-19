@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{incomeStatement}
 \alias{incomeStatement}
-\title{retrieve income statement for a symbol as dataframe}
+\title{Retrieve income statement data. Available quarterly (4 quarters) or annually (4 years).}
 \usage{
 incomeStatement(symbol, period = "quarter", lastN = 1)
 }
@@ -17,7 +17,7 @@ incomeStatement(symbol, period = "quarter", lastN = 1)
 a dataframe
 }
 \description{
-retrieve income statement for a symbol as dataframe
+Data Weighting: 1000 message units per symbol per period
 }
 \examples{
 incomeStatement("AAPL",period = "quarter", lastN =4)

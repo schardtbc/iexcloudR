@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{cashflowStatement}
 \alias{cashflowStatement}
-\title{retrieve cash flow statement for a symbol as dataframe}
+\title{Pulls cash flow data. Available quarterly (4 quarters) and annually (4 years)}
 \usage{
 cashflowStatement(symbol, period = "quarter", lastN = 1)
 }
@@ -17,7 +17,10 @@ cashflowStatement(symbol, period = "quarter", lastN = 1)
 a dataframe
 }
 \description{
-retrieve cash flow statement for a symbol as dataframe
+Data Weighting: 1000 message units per symbol per period
+}
+\details{
+Data Schedule: Updates at 8am, 9am UTC daily
 }
 \examples{
 cashflowStatement("AAPL",period = "quarter", lastN =4)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{balanceSheet}
 \alias{balanceSheet}
-\title{retrieve balance sheet for a symbol as dataframe}
+\title{Pulls balance sheet data. Available quarterly (4 quarters) and annually (4 years)}
 \usage{
 balanceSheet(symbol, period = "quarter", lastN = 1)
 }
@@ -17,7 +17,10 @@ balanceSheet(symbol, period = "quarter", lastN = 1)
 a dataframe
 }
 \description{
-retrieve balance sheet for a symbol as dataframe
+Data Weighting: 3000 message units per symbol per period
+}
+\details{
+Data Schedule: Updates at 8am, 9am UTC daily
 }
 \examples{
 balanceSheet("AAPL",period = "quarter", lastN =4)
