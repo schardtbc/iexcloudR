@@ -78,30 +78,31 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 
 |     | Endpoint       | Message Units | per |
 |-----|----------------|---------------:|-----|
-| [ ] | MetaData | 0 | as in free
-| [ ] | Usage | 0 | as in free
+| [X] | MetaData | 0 | as in free
+| [X] | Usage | 0 | as in free
 | [ ] | Pay as you go | 0 | as in free
 
 
 ### Stocks
 |     | Endpoint       | Message Units | per |
 |-----|----------------|---------------:|-----|
-| [x] | Balance Sheet |        3000 | per symbol per period |
-| [ ] | Batch Requests |    varies | with data types requested |     
+| [X] | Balance Sheet |         3000 |per symbol per period |
+| [ ] | Batch Requests |      varies |with data types requested |     
 | [ ] | Book |                     1 |per symbol   
-| [x] | Cash Flow |             1000 |per symbol per period
+| [X] | Cash Flow |             1000 |per symbol per period
 | [ ] | Collections  |             1 |per symbol in  collection
-| [x] | Company  |                 1 |per symbol
-| [x] | Delayed Quote  |           1 |per symbol
-| [x] | Dividends  |              10 |per symbol
-| [x] | Earnings |              1000 |per symbol per period
+| [X] | Company  |                 1 |per symbol
+| [X] | Delayed Quote  |           1 |per symbol
+| [X] | Dividends  |              10 |per symbol
+| [X] | Earnings |              1000 |per symbol per period
 | [ ] | Earnings Today|         1051 |per symbol returned
-| [x] | Effective Spread  |         0  |as in free
-| [x] | Estimates |             10000  |per symbol per period
-| [x] | Financials  |            5000 |per symbol per period
-| [x] | Historical Prices | | |
-| [x] | End of day |    10 |per symbol per day
-| [x] | Income Statement |  1000 | per symbol per period
+| [X] | Effective Spread  |        0 |as in free
+| [X] | Estimates |            10000 |per symbol per period
+| [X] | Financials  |           5000 |per symbol per period
+|     | Historical Prices |          | |
+| [X] | End of day |    10 |per symbol per day
+| [X] | Intraday |      1 |per symbol per perios max 50 per call |
+| [X] | Income Statement |  1000 | per symbol per period
 | [ ] | IPO Calendar upcoming-ipos | 100 | per IPO returned
 | [ ] | IPO Calendar today-ipos | 500 | per iPO returned
 | [x] | Key Stats | 20 | per symbol
@@ -116,11 +117,11 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 | [X] | Price | 1 | per symbol per call
 | [X] | Price Target | 500 per symbol
 | [X] | Quote | 1 | per quote 
-| [ ] | Sector Performance | 1 | per sector
-| [ ] | Social Sentiment, daily | 100 | per date
-| [ ] | Social Sentiment, by minute | 200 | per date
-| [ ] | Splits | 10 | per symbol  per record
-| [ ] | Volume by Venue | 20 | per call
+| [X] | Sector Performance | 1 | per sector
+| [X] | Social Sentiment, daily | 100 | per date
+| [X] | Social Sentiment, by minute | 200 | per date
+| [X] | Splits | 10 | per symbol  per record
+| [X] | Volume by Venue | 20 | per call
 
 ### Alternative Data
 |     | Endpoint       | Message Units | per |
@@ -149,8 +150,8 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 
 |     | Endpoint       |
 |-----|----------------|
-| [ ] | TOPS | 
-| [ ] | TOPS Last | 
+| [X] | TOPS | 
+| [X] | TOPS Last | 
 | [ ] | DEEP | 
 | [ ] | DEEP Auction | 
 | [ ] | DEEP Book |
