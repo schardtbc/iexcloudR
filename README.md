@@ -31,6 +31,8 @@ IEXCLOUD_SECRET_KEY = "sk_..."
 # do not hard code the keys into your application code
 # do not upload the keys to github.
 # you can easily change the keys if they become compromised
+
+Note: when IEXCLOUD_PUBLIC_KEY starts with a "T" ,as in "Tpk= ..." then the base url used will be the sandbox url instead of the production cloud url
 ```
 
 To test that everything installed correctly and the .env file is properly setup you can use the following or similar code
