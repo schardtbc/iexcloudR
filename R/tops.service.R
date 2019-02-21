@@ -30,7 +30,9 @@ tops <- function(symbol ="",sector = null, securityType = null) {
   if (nchar(symbol)==0) {
     result <- dplyr::filter(result,!(lastSaleTime== 0 & bidPrice == 0 & askPrice == 0 ));
   }
-  return (r)
+  result <- dplyr::mutate(result, datetime = lubridate::with_tz(lubridate::as_datetime(lastSaleTime/1000),"America/New_York")) %>%
+    dplyr::mutate(minute = lubridate::hour(datetime)*60+lubridate::minute(datetime));
+  return (result)
 }
 
 #' IEX last sale price

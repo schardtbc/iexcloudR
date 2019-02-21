@@ -271,7 +271,7 @@ historyFor <- function (symbol,
   df <- dplyr::mutate(df, period = lubridate::hm(minute)) %>%
     dplyr::mutate(dminute = lubridate::period_to_seconds(period - period[1])/60) %>%
     dplyr::select(-period,-minute) %>%
-    rename(minute = dminute);
+    dplyr::rename(minute = dminute);
   }
   return (df);
 };

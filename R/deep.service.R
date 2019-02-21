@@ -94,9 +94,11 @@
   #' @examples
   #' deepTrades('AAPL')\
   deepTrades <- function(symbol) {
-    endpoint <- glue::glue('/deep/official-price?symbols={symbol}');
+    endpoint <- glue::glue('/deep/trades?symbols={symbol}');
     res <- iex(endpoint);
-    data <- res[symbol];
-    tibble::as_tibble(do.call(rbind,res)) %>%
-      tidyr::unnest();
+    data <- res[[symbol]];
+    tibble::as_tibble(do.call(rbind,data)) %>%
+      tidyr::unnest() %>%
+      dplyr::mutate(datetime = lubridate::with_tz(lubridate::as_datetime(timestamp/1000),"America/New_York")) %>%
+      dplyr::mutate(minute = lubridate::hour(datetime)*60+lubridate::minute(datetime));
   }
