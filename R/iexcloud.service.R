@@ -30,7 +30,7 @@ constructURL <- function(endpoint) {
 #' @export
 iex <- function(endpoint) {
   url <- constructURL(endpoint);
-  show(url);
+  # show(url);
   res <- httr::GET(url);
   httr::content(res);
 };
