@@ -491,7 +491,8 @@ priceTarget <- function (symbol) {
 #' quoteFor("AAPL")
 quoteFor <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/quote');
-  res = iex(endpoint);
+  res <- iex(endpoint);
+  res <- lapply(res, function(x) { ifelse( is.null(x),NA,x)})
   tibble::as_tibble(res)
 };
 
