@@ -88,6 +88,7 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 ### Stocks
 |     | Endpoint       | Message Units | per |
 |-----|----------------|---------------:|-----|
+| [X] | Advanced Stats | 3020 | per symbol
 | [X] | Balance Sheet |         3000 |per symbol per period |
 | [ ] | Batch Requests |      varies |with data types requested |     
 | [ ] | Book |                     1 |per symbol   
@@ -103,6 +104,9 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 | [X] | Financials  |           5000 |per symbol per period
 |     | Historical Prices |          | |
 | [X] | End of day |    10 |per symbol per day
+| [X] | Insder Roster | 5000 | per symbol
+| [X] | Insider Summary | 5000 | per symbol
+| [X] | Insider Transactions | 50 per transaction
 | [X] | Intraday |      1 |per symbol per perios max 50 per call |
 | [X] | Income Statement |  1000 | per symbol per period
 | [ ] | IPO Calendar upcoming-ipos | 100 | per IPO returned
@@ -119,6 +123,7 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 | [X] | Price | 1 | per symbol per call
 | [X] | Price Target | 500 per symbol
 | [X] | Quote | 1 | per quote 
+| [X] | Recomendation Trends | 5000 | per symbol
 | [X] | Sector Performance | 1 | per sector
 | [X] | Social Sentiment, daily | 100 | per date
 | [X] | Social Sentiment, by minute | 200 | per date
