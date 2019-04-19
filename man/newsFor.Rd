@@ -4,7 +4,7 @@
 \alias{newsFor}
 \title{Retrieve real time traded volume on U.S. markets.}
 \usage{
-newsFor(subject, lastN = 10)
+newsFor(subject, lastN = 5)
 }
 \value{
 subject "market" | symbol

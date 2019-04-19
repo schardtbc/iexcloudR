@@ -193,6 +193,28 @@ financials <- function (symbol, lastN=1) {
     tidyr::unnest();
 };
 
+#' Returns the top 10 fund holders,
+#' meaning any firm not defined as buy-side or sell-side such as mutual funds,
+#' pension funds, endowments, investment firms,
+#' and other large entities that manage funds on behalf of others.
+#'
+#' Data Weighting: 10000 message units per symbol per period
+#'
+#' @param symbol stock symbol
+#' @return a dataframe
+#' @export
+#' @examples
+#' fundOwnership("AAPL")
+fundOwnership <- function (symbol, lastN=1) {
+  endpoint <- glue::glue('/stock/{symbol}/fund-ownership/');
+  res = iex(endpoint);
+  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  tibble::as_tibble(do.call(rbind,data)) %>%
+    tibble::add_column(symbol = symbol,.before=1) %>%
+    tidyr::unnest() %>%
+    dplyr::mutate(report_date = lubridate::ymd(lubridate::as_datetime(report_date/1000)));
+};
+
 #' Retrieve history for a stock over chosen time-period as dataframe
 #'
 #' Data Weighting:
@@ -276,6 +298,66 @@ historyFor <- function (symbol,
   return (df);
 };
 
+
+#' Returns Insider Transactions
+#'
+#' Data Weighting: 50 message units per transaction
+#'
+#' @param symbol stock symbol
+#' @return a dataframe
+#' @export
+#' @examples
+#' insiderTransactions("AAPL")
+insiderTransactions <- function (symbol) {
+  endpoint <- glue::glue('/stock/{symbol}/insider-transactions');
+  res = iex(endpoint);
+  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  tibble::as_tibble(do.call(rbind,data)) %>%
+    tibble::add_column(symbol = symbol,.before=1) %>%
+    tidyr::unnest() %>%
+    dplyr::mutate(effectiveDate = lubridate::ymd(lubridate::as_datetime(effectiveDate/1000)));
+};
+
+
+#' Returns Insider Roster
+#'
+#' Data Weighting: 5000 message units per symbol
+#'
+#' @param symbol stock symbol
+#' @return a dataframe
+#' @export
+#' @examples
+#' insiderRoster("AAPL")
+insiderRoster <- function (symbol) {
+  endpoint <- glue::glue('/stock/{symbol}/insider-roster');
+  res = iex(endpoint);
+  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  tibble::as_tibble(do.call(rbind,data)) %>%
+    tibble::add_column(symbol = symbol,.before=1) %>%
+    tidyr::unnest() %>%
+  dplyr::mutate(reportDate = lubridate::ymd(lubridate::as_datetime(reportDate/1000)));
+};
+
+#' Returns Insider Summary
+#'
+#' Data Weighting: 5000 message units per symbol
+#'
+#' @param symbol stock symbol
+#' @return a dataframe
+#' @export
+#' @examples
+#' insiderSummary("AAPL")
+insiderSummary <- function (symbol) {
+  endpoint <- glue::glue('/stock/{symbol}/insider-summary');
+  res = iex(endpoint);
+  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  tibble::as_tibble(do.call(rbind,data)) %>%
+    tibble::add_column(symbol = symbol,.before=1) %>%
+    tidyr::unnest()
+
+};
+
+
 #' This call returns an array of symbols that IEX Cloud supports for API calls.
 #'
 #' Data Weighting:
@@ -338,6 +420,22 @@ keyStats <- function (symbol) {
   tibble::add_column(symbol = symbol,.before=1)
 };
 
+#' Retrieve advancedStats detail for a symbol as dataframe
+#'
+#' Data Weighting: 20 message units per call per symbol
+#'
+#' @param symbol stock symbol
+#' @return a dataframe
+#' @export
+#' @examples
+#' keyStats("AAPL")
+advancedStats <- function (symbol) {
+  endpoint <- glue::glue('/stock/{symbol}/advanced-stats');
+  res = iex(endpoint);
+  tibble::as_tibble(res) %>%
+    tibble::add_column(symbol = symbol,.before=1)
+};
+
 #' Retrieve 15 minute delayed, last sale eligible trades.
 #'
 #' Data Weight: 1 message unit per trade returned
@@ -364,7 +462,9 @@ largestTrades <- function (symbol) {
 listOf <- function (listType = "mostactive") {
   endpoint <- glue::glue('/stock/market/list/{listType}');
   res = iex(endpoint);
-  tibble::as_tibble(do.call(rbind,res))
+  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
+  tibble::as_tibble(do.call(rbind,data)) %>%
+    tidyr::unnest();
 };
 
 
@@ -401,16 +501,16 @@ marketVolume <- function () {
 #' @export
 #' @examples
 #' newsFor('AAPL')
-newsFor <- function (subject,lastN = 10) {
+newsFor <- function (subject,lastN = 5) {
   if (subject == 'market'){
-    endpoint = "/market/news/last/{lastN}"
+    endpoint = glue::glue("/market/news/last/{lastN}")
   } else {
-    endpoiont = '/stock/{subject}/last/{lastN}'
+    endpoint = glue::glue("/stock/{subject}/news/last/{lastN}")
   }
   res = iex(endpoint);
   tibble::as_tibble(do.call(rbind,res)) %>%
-    tidyr::unnest() %>%
-    tibble::add_column(symbol = symbol,.before=1)
+  tidyr::unnest() %>%
+  tibble::add_column(symbol = subject,.before=1)
 };
 
 #' retrieve the official open and close for a given symbol.
@@ -449,6 +549,28 @@ previousDay <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/previous');
   res = iex(endpoint);
   tibble::as_tibble(res)
+};
+
+#' Retrieve previous day adjusted price data for one or more stocks
+#'
+#' Data Weighting: 2 message units per symbol
+#'
+#' @param df dataframe returned from previousDay call
+#' @return a dataframe
+#' @export
+#' @examples
+#' previousDay("AAPL") %>% dailyTimeSeriesAdapter()
+dailyTimeSeriesAdapter <- function (df) {
+    dplyr::rename(df,aOpen = open, aHigh = high, aLow = low, aClose = close, aVolume = volume,
+           open = uOpen,high=uHigh,low=uLow,close=uClose, volume = uVolume) %>%
+    dplyr::mutate(
+           datetime = lubridate::as_datetime(paste0(date," 09:30:00"), tz = "America/New_York"),
+           sequenceID = 0,
+           sourceName = "IEX",
+           dividendAmount=0,
+           splitCoefficient = 0,
+           epoch = as.numeric(lubridate::seconds(datetime))) %>%
+    dplyr::select(symbol,date,sourceName,sequenceID,datetime,epoch,open,high,low,close,volume,aOpen,aHigh,aLow,aClose,aVolume,dividendAmount,splitCoefficient)
 };
 
 #' Retrieve A single number, being the IEX real time price, the 15 minute delayed market price, or the previous close price, is returned.
@@ -492,6 +614,11 @@ priceTarget <- function (symbol) {
 quoteFor <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/quote');
   res <- iex(endpoint);
+  res_class = class(res);
+  if (length(res_class) >1 || res_class != "list") {
+    message(paste(symbol," Unknown"),"\r",appendLF=FALSE)
+    return (tibble::as_tibble(list()))
+    }
   res <- lapply(res, function(x) { ifelse( is.null(x),NA,x)})
   tibble::as_tibble(res)
 };
@@ -520,6 +647,25 @@ socialSentiment <- function (symbol, date, type="daily") {
   res = iex(endpoint);
   tibble::as_tibble(do.call(rbind,res)) %>%
     tidyr::unnest();
+};
+
+#' Analyst Recommendation Summary
+#'
+#' 1000 message units per symbol
+#'
+#' @param symbol stock symbol
+#' @return a dataframe
+#' @export
+#' @examples
+#' recommendationTrends("AAPL")
+recommendationTrend <- function (symbol) {
+  endpoint <- glue::glue('/stock/{symbol}/recommendation-trends');
+  res = iex(endpoint);
+  tibble::as_tibble(do.call(rbind,res)) %>%
+    tidyr::unnest() %>%
+  dplyr::mutate(concensusEndDate = lubridate::ymd(lubridate::as_datetime(concensusEndDate/1000)),
+                concensusStartDate = lubridate::ymd(lubridate::as_datetime(concensusStartDate/1000)),
+                corporateActionAppliedDate = lubridate::ymd(lubridate::as_datetime(corporateActionAppliedDate/1000)));
 };
 
 #' Retrieve splits for a symbol
