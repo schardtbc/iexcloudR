@@ -126,6 +126,27 @@ earnings <- function (symbol, lastN=1) {
     tidyr::unnest();
 };
 
+#' Retrieve Earnings data for a given company including the actual EPS, consensus, and fiscal period.
+#'  Earnings are available quarterly (last 4 quarters) and annually (last 4 years).
+#'
+#' Data Weighting: 1000 mesaage units per symbol per period
+#'
+#' Data Schedule: Updates at 9am, 11am, 12pm UTC every da
+#'
+#' @return a dataframe
+#' @export
+#' @examples
+#' earningsToday()
+earningsToday <- function (symbol, lastN=1) {
+  endpoint <- glue::glue('/stock/market/today-earnings');
+  res = iex(endpoint);
+  df <-lapply(res,function(o) (tibble::as_tibble(do.call(rbind,lapply(o,function(x) {x[["quote"]]<-NULL; x})))))
+  df <- tibble::enframe(df) %>% tidyr::unnest()
+  df$consensusEPS <-as.numeric(unlist(df$consensusEPS))
+  df <- df %>% tidyr::unnest() %>% dplyr::select(-name)
+  return (df)
+};
+
 #' retrieve effective spread for a symbol as dataframe
 #'
 #' This returns an array of effective spread, eligible volume, and price improvement of a stock, by market.

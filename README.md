@@ -98,7 +98,7 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 | [X] | Delayed Quote  |           1 |per symbol
 | [X] | Dividends  |              10 |per symbol
 | [X] | Earnings |              1000 |per symbol per period
-| [ ] | Earnings Today|         1051 |per symbol returned
+| [X] | Earnings Today|         1001 |per symbol returned
 | [X] | Effective Spread  |        0 |as in free
 | [X] | Estimates |            10000 |per symbol per period
 | [X] | Financials  |           5000 |per symbol per period
@@ -106,7 +106,7 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 | [X] | End of day |    10 |per symbol per day
 | [X] | Insder Roster | 5000 | per symbol
 | [X] | Insider Summary | 5000 | per symbol
-| [X] | Insider Transactions | 50 per transaction
+| [X] | Insider Transactions | 50 | per transaction
 | [X] | Intraday |      1 |per symbol per perios max 50 per call |
 | [X] | Income Statement |  1000 | per symbol per period
 | [ ] | IPO Calendar upcoming-ipos | 100 | per IPO returned
@@ -121,7 +121,7 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 | [X] | Peers | 500 | per symbol
 | [X] | Previous Day Prices | 2 per symbol
 | [X] | Price | 1 | per symbol per call
-| [X] | Price Target | 500 per symbol
+| [X] | Price Target | 500 | per symbol
 | [X] | Quote | 1 | per quote 
 | [X] | Recomendation Trends | 5000 | per symbol
 | [X] | Sector Performance | 1 | per sector
