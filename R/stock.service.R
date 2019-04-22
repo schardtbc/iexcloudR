@@ -437,7 +437,8 @@ incomeStatement <- function (symbol,period = "quarter",lastN=1) {
 keyStats <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/stats');
   res = iex(endpoint);
-  tibble::as_tibble(res) %>%
+  data <- lapply(res,function(y) {ifelse(is.null(y),NA,y[[1]])});
+  tibble::as_tibble(data) %>%
   tibble::add_column(symbol = symbol,.before=1)
 };
 
@@ -453,7 +454,8 @@ keyStats <- function (symbol) {
 advancedStats <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/advanced-stats');
   res = iex(endpoint);
-  tibble::as_tibble(res) %>%
+  data <- lapply(res,function(y) {ifelse(is.null(y),NA,y[[1]])});
+  tibble::as_tibble(data)  %>%
     tibble::add_column(symbol = symbol,.before=1)
 };
 
