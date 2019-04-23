@@ -118,6 +118,7 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 | [X] | Market Volume (U.S.) | 1 | per call
 | [X] | News | 10 | per news item returned
 | [X] | OHLC | 2 | per symbol
+| [X] | marketOpen | 500 | all symbols |
 | [X] | Peers | 500 | per symbol
 | [X] | Previous Day Prices | 2 per symbol
 | [X] | Price | 1 | per symbol per call

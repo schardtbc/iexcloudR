@@ -542,8 +542,37 @@ newsFor <- function (subject,lastN = 5) {
 #' @examples
 #' ohlc('AAPL')
 ohlc <- function (symbol) {
-  endpoint = '/stock/{symbol}/ohlc'
+  endpoint = glue::glue('/stock/{symbol}/ohlc')
   res = iex(endpoint);
+  r <- list(open = res$open$price, openTime = res$open$time, close = res$close$price,
+            closeTime = res$close$time, high=res$high, low = res$low);
+  tibble::as_tibble(r) %>%
+  dplyr::mutate(openTime = lubridate::as_datetime(openTime/1000, tz = "America/New_York"),
+                closeTime = lubridate::as_datetime(closeTime/1000, tz = "America/New_York")) %>%
+  tibble::add_column(symbol = symbol,.before=1)
+};
+
+#' retrieve the official open and close for a given symbol.
+#' @return  symbol a market symbol
+#' @export
+#' @examples
+#' marketOpen('AAPL')
+marketOpen <- function () {
+  endpoint = '/stock/market/ohlc'
+  response = iex(endpoint);
+  records <- lapply(response,function(res) {list(open = ifelse(is.null(res$open$price),NA,res$open$price),
+                                                 openTime = ifelse(is.null(res$open$time),NA,res$open$time),
+                                                 close = ifelse(is.null(res$close$price),NA,res$close$price),
+                                                 closeTime = ifelse(is.null(res$close$time),NA,res$close$time)
+                                                 )});
+  symbols <- names(records);
+  tibble::as_tibble(do.call(rbind,records)) %>%
+    tidyr::unnest() %>%
+    dplyr::mutate(openTime = lubridate::as_datetime(openTime/1000, tz = "America/New_York"),
+                  closeTime = lubridate::as_datetime(closeTime/1000, tz = "America/New_York"),
+                  gain = round(100*(open-close)/close,2)) %>%
+    tibble::add_column(symbol = symbols,.before=1) %>%
+    dplyr::arrange(symbol)
 };
 
 #' retrieves an array of peer symbols.
