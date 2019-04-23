@@ -128,6 +128,7 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 | [X] | Social Sentiment, daily | 100 | per date
 | [X] | Social Sentiment, by minute | 200 | per date
 | [X] | Splits | 10 | per symbol  per record
+| [X] | Upcoming Earnings | 5 | per symbol 
 | [X] | Volume by Venue | 20 | per call
 
 ### Alternative Data

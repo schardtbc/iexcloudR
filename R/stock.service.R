@@ -713,6 +713,17 @@ splits <- function (symbol, date, type="daily") {
     tidyr::unnest();
 };
 
+#' returns upcoming earnings reportDates for market
+#'
+#' @export
+upcomingEarnings<- function(symbol = "market"){
+  endpoint <- glue::glue("/stock/{symbol}/upcoming-earnings")
+  res = iex(endpoint)
+  tibble::as_tibble(do.call(rbind,res)) %>%
+    tidyr::unnest() %>% dplyr::arrange(symbol)
+}
+
+
 #' Returns 15 minute delayed and 30 day average consolidated volume percentage of a stock, by market.
 #'  This call will always return 13 values, and will be sorted in ascending order by current day trading volume percentage.
 #'

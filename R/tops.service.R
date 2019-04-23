@@ -30,8 +30,9 @@ tops <- function(symbol ="",sector = null, securityType = null) {
   if (nchar(symbol)==0) {
     result <- dplyr::filter(result,!(lastSaleTime== 0 & bidPrice == 0 & askPrice == 0 ));
   }
-  result <- dplyr::mutate(result, datetime = lubridate::with_tz(lubridate::as_datetime(lastSaleTime/1000),"America/New_York")) %>%
-    dplyr::mutate(minute = lubridate::hour(datetime)*60+lubridate::minute(datetime));
+  result <- dplyr::mutate(result, lastSaleTime = lubridate::with_tz(lubridate::as_datetime(lastSaleTime/1000),"America/New_York"),
+                          lastUpdated = lubridate::with_tz(lubridate::as_datetime(lastUpdated/1000),"America/New_York"),
+                          minute = lubridate::hour(lastSaleTime)*60+lubridate::minute(lastSaleTime)-570);
   return (result)
 }
 
@@ -61,6 +62,10 @@ topsLast <- function(symbol="") {
   }
   res = iex(endpoint);
   result <-tibble::as_tibble(do.call(rbind,res)) %>%
-    tidyr::unnest();
+    tidyr::unnest() %>%
+    dplyr::mutate(
+      time = lubridate::with_tz(lubridate::as_datetime(time/1000),"America/New_York"),
+      minute = lubridate::hour(time)*60+lubridate::minute(time)-570) %>%
+    dplyr::arrange(symbol)
   return (result)
 }
