@@ -552,11 +552,11 @@ ohlc <- function (symbol) {
   tibble::add_column(symbol = symbol,.before=1)
 };
 
-#' retrieve the official open and close for a given symbol.
-#' @return  symbol a market symbol
+#' retrieve the official open and close the market. 15 min delayed
+#' @return  df
 #' @export
 #' @examples
-#' marketOpen('AAPL')
+#' marketOpen()
 marketOpen <- function () {
   endpoint = '/stock/market/ohlc'
   response = iex(endpoint);
