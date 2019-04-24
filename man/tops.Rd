@@ -4,10 +4,14 @@
 \alias{tops}
 \title{IEX TOP of Book Quote Feed,}
 \usage{
-tops(symbol = "", sector = null, securityType = null)
+tops(symbol = "", securityType = null, sector = null)
 }
 \arguments{
 \item{symbol}{a market symbol, when absent will return all market symbols}
+
+\item{securityType}{| NULL filter}
+
+\item{sector}{| NULL filter}
 }
 \value{
 a data frame (filtered to remove symbols with no recorded sales i.e. lastSaleTime==0)

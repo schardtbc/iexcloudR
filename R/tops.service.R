@@ -11,16 +11,20 @@
 #'
 #' Data Schedule: Market hours 9:30am-4pm ET
 #'
-#'Data Source(s): Consolidated Tape Investors Exchange
+#' Data Source(s): Consolidated Tape Investors Exchange
 #'
 #' @param symbol a market symbol, when absent will return all market symbols
+#' @param securityType | NULL filter
+#' @param sector | NULL filter
 #' @return a data frame (filtered to remove symbols with no recorded sales i.e. lastSaleTime==0)
 #' @export
 #' @examples
 #' tops('AAPL')
-tops <- function(symbol ="",sector = null, securityType = null) {
+tops <- function(symbol ="", securityType = null, sector = null) {
+  market <- FALSE
   if (nchar(symbol)==0){
-    endpoint = '/tops'
+    endpoint <- '/tops'
+    market <- TRUE
   } else {
   endpoint <- glue::glue('/tops?symbols={symbol}');
   }
@@ -33,8 +37,19 @@ tops <- function(symbol ="",sector = null, securityType = null) {
   result <- dplyr::mutate(result, lastSaleTime = lubridate::with_tz(lubridate::as_datetime(lastSaleTime/1000),"America/New_York"),
                           lastUpdated = lubridate::with_tz(lubridate::as_datetime(lastUpdated/1000),"America/New_York"),
                           minute = lubridate::hour(lastSaleTime)*60+lubridate::minute(lastSaleTime)-570);
+  if (!is.null(sector)) {
+    result <- dplyr::filter(result,sector == sector)
+  }
+  if (!is.null(securityType)) {
+    result <- dplyr::filter(result,securityType == securityType)
+  }
+  if (market) {
+    result <- dplyr::arrange(symbol)
+  }
   return (result)
 }
+
+
 
 #' IEX last sale price
 #'

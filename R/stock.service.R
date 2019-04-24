@@ -556,8 +556,8 @@ ohlc <- function (symbol) {
 #' @return  df
 #' @export
 #' @examples
-#' marketOpen()
-marketOpen <- function () {
+#' marketOpenClose()
+marketOpenClose <- function () {
   endpoint = '/stock/market/ohlc'
   response = iex(endpoint);
   records <- lapply(response,function(res) {list(open = ifelse(is.null(res$open$price),NA,res$open$price),
@@ -570,7 +570,9 @@ marketOpen <- function () {
     tidyr::unnest() %>%
     dplyr::mutate(openTime = lubridate::as_datetime(openTime/1000, tz = "America/New_York"),
                   closeTime = lubridate::as_datetime(closeTime/1000, tz = "America/New_York"),
-                  gain = round(100*(open-close)/close,2)) %>%
+                  gain = dplyr::case_when(
+                    openTime>closeTime ~ round(100*(open-close)/close,2),
+                    closeTime>openTime ~ round(100*(close-open)/open,2))) %>%
     tibble::add_column(symbol = symbols,.before=1) %>%
     dplyr::arrange(symbol)
 };
