@@ -4,7 +4,7 @@
 \alias{tops}
 \title{IEX TOP of Book Quote Feed,}
 \usage{
-tops(symbol = "", securityType = null, sector = null)
+tops(symbol = "", securityType = NULL, sector = NULL)
 }
 \arguments{
 \item{symbol}{a market symbol, when absent will return all market symbols}

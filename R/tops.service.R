@@ -20,7 +20,7 @@
 #' @export
 #' @examples
 #' tops('AAPL')
-tops <- function(symbol ="", securityType = null, sector = null) {
+tops <- function(symbol ="", securityType = NULL, sector = NULL) {
   market <- FALSE
   if (nchar(symbol)==0){
     endpoint <- '/tops'
@@ -28,7 +28,7 @@ tops <- function(symbol ="", securityType = null, sector = null) {
   } else {
   endpoint <- glue::glue('/tops?symbols={symbol}');
   }
-  res = iex(endpoint);
+  res <- iex(endpoint);
   result <-tibble::as_tibble(do.call(rbind,res)) %>%
     tidyr::unnest()
   if (nchar(symbol)==0) {
@@ -44,7 +44,7 @@ tops <- function(symbol ="", securityType = null, sector = null) {
     result <- dplyr::filter(result,securityType == securityType)
   }
   if (market) {
-    result <- dplyr::arrange(symbol)
+    result <- dplyr::arrange(result,symbol)
   }
   return (result)
 }

@@ -60,7 +60,18 @@ cashflowStatement <- function (symbol,period = "quarter",lastN=1) {
 company <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/company');
   res = iex(endpoint);
-  #tibble::as_tibble(res)
+  if (class(res)[[1]] != "xml_document") {
+  data <- lapply(res,function(x) {ifelse(is.null(x),NA,x)});
+  result <- tibble::as_tibble(do.call(cbind,data)) %>% dplyr::select(-tags) %>% tidyr::unnest() %>% dplyr::distinct();
+  if (length(res$tags)>0){
+     result<-tibble::add_column(result,tags = do.call(paste,c(res$tags, sep="; ")));
+  } else {
+    result<-tibble::add_column(result,tags = NA);
+  }
+  return (result)
+  } else {
+    return (NULL)
+  }
 };
 
 #' Retrieve delayed quote for a symbol as dataframe
@@ -340,6 +351,9 @@ insiderTransactions <- function (symbol) {
 };
 
 
+
+
+
 #' Returns Insider Roster
 #'
 #' Data Weighting: 5000 message units per symbol
@@ -379,29 +393,7 @@ insiderSummary <- function (symbol) {
 };
 
 
-#' This call returns an array of symbols that IEX Cloud supports for API calls.
-#'
-#' Data Weighting:
-#' - symbols, otc, mutual-fund: 100 message units per call
-#' - iex: free;
-#'   This call returns an array of symbols the Investors Exchange supports for trading.
-#'    This list is updated daily as of 7:45 a.m. ET. Symbols may be added or removed by
-#'    the Investors Exchange after the list was produced.
-#'
-#' @param symbolType "symbols" | "iex" | "otc" | "mutual-fund" |
-#' @return a dataframe
-#' @export
-#' @examples
-#' symbols("iex")
-listSymbols <- function (symbolType) {
-  if (symbolType == 'symbols') {
-    endpoint = '/ref-data/symbols'
-  } else {
-    endpoint <- glue::glue('/ref-data/{symbolType}/symbols');
-  }
-  res = iex(endpoint);
-  tibble::as_tibble(do.call(rbind,data))
-};
+
 
 #' Retrieve income statement data. Available quarterly (4 quarters) or annually (4 years).
 #'

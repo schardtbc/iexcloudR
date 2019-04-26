@@ -169,7 +169,7 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 | [ ] | DEEP Security Event |
 | [ ] | DEEP Short Sale Price Tst Status | 
 | [ ] | DEEP System Event |
-| [ ] | DEEP Trades |
+| [X] | DEEP Trades |
 | [ ] | DEEP Trade Break |
 | [ ] | DEEP Trading Status |
 | [ ] | Listed Regulation SHO Threshold Securities List |
