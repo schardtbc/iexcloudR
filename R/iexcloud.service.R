@@ -1,12 +1,21 @@
 
 
-readRenviron(".env")
+if (file.exists(".env")){
+  print("reading .env file")
+  readRenviron(".env");
+}
 env<-Sys.getenv();
 iexcloud <- env[grep("^IEXCLOUD",names(env))];
 
 
 baseURL = paste0("https://cloud.iexapis.com/",iexcloud["IEXCLOUD_API_VERSION"]);
 sandboxURL = paste0("https://sandbox.iexapis.com/",iexcloud["IEXCLOUD_API_VERSION"]);
+
+print(env);
+print(baseURL);
+print(sandboxURL);
+
+
 
 addToken <- function(endpoint){
   ifelse(stringr::str_detect(endpoint,stringr::fixed("?")),
@@ -19,6 +28,8 @@ prefix <- function() {
   ifelse(substr(iexcloud["IEXCLOUD_PUBLIC_KEY"],1,1) == "T", sandboxURL, baseURL)
 }
 
+#' construct the url for the api get request
+#' @export
 constructURL <- function(endpoint) {
   paste0(prefix(),addToken(endpoint))
 }

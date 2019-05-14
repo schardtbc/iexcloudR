@@ -17,11 +17,16 @@ balanceSheet <- function (symbol,period = "quarter",lastN=1) {
   endpoint <- glue::glue('/stock/{symbol}/balance-sheet/{lastN}?period={period}');
   res <- iex(endpoint);
   data <- res$balancesheet
+  if (!is.null(data) && length(data)>0){
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
-  tibble::as_tibble(do.call(rbind,data)) %>%
-    tibble::add_column(symbol = symbol,.before=1) %>%
+  result <- tibble::as_tibble(do.call(rbind,data)) %>%
+    tibble::add_column(symbol = symbol,period=period,.before=1) %>%
     tidyr::unnest() %>%
     dplyr::mutate_at(dplyr::vars(reportDate),dplyr::funs(as.Date(.)))
+  } else {
+    result <- tibble::as_tibble()
+  }
+  return (result)
 };
 
 #' Pulls cash flow data. Available quarterly (4 quarters) and annually (4 years)
@@ -41,11 +46,16 @@ cashflowStatement <- function (symbol,period = "quarter",lastN=1) {
   endpoint <- glue::glue('/stock/{symbol}/cash-flow/{lastN}?period={period}');
   res = iex(endpoint);
   data <- res$cashflow
+  if (!is.null(data) && length(data)>0){
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
-  tibble::as_tibble(do.call(rbind,data)) %>%
-    tibble::add_column(symbol = symbol,.before=1) %>%
+  result <- tibble::as_tibble(do.call(rbind,data)) %>%
+    tibble::add_column(symbol = symbol,period=period,.before=1) %>%
     tidyr::unnest() %>%
     dplyr::mutate_at(dplyr::vars(reportDate),dplyr::funs(as.Date(.)))
+  } else {
+    result <- tibble::as_tibble();
+  }
+  return(result)
 };
 
 #' retrieve company detail for a symbol as dataframe
@@ -331,6 +341,7 @@ historyFor <- function (symbol,
 };
 
 
+
 #' Returns Insider Transactions
 #'
 #' Data Weighting: 50 message units per transaction
@@ -409,12 +420,17 @@ insiderSummary <- function (symbol) {
 incomeStatement <- function (symbol,period = "quarter",lastN=1) {
   endpoint <- glue::glue('/stock/{symbol}/income/{lastN}?period={period}');
   res = iex(endpoint);
-  data <- res$income
+  data <- res$income;
+  if (!is.null(data) && length(data)>0){
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
-  tibble::as_tibble(do.call(rbind,data)) %>%
-    tibble::add_column(symbol = symbol,.before=1) %>%
+  result <-tibble::as_tibble(do.call(rbind,data)) %>%
+    tibble::add_column(symbol = symbol,period=period,.before=1) %>%
     tidyr::unnest() %>%
     dplyr::mutate_at(dplyr::vars(reportDate),dplyr::funs(as.Date(.)))
+  } else {
+    result <- tibble::as_tibble();
+  }
+  return (result)
 };
 
 #' Retrieve keyStats detail for a symbol as dataframe
@@ -429,6 +445,11 @@ incomeStatement <- function (symbol,period = "quarter",lastN=1) {
 keyStats <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/stats');
   res = iex(endpoint);
+  res_class <- class(res);
+  if (length(res_class) >1 || res_class != "list") {
+    # message(paste(symbol," Unknown"),"\r",appendLF=FALSE);
+    return (tibble::as_tibble());
+  }
   data <- lapply(res,function(y) {ifelse(is.null(y),NA,y[[1]])});
   tibble::as_tibble(data) %>%
   tibble::add_column(symbol = symbol,.before=1)
