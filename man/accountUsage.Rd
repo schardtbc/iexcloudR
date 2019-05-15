@@ -4,7 +4,7 @@
 \alias{accountUsage}
 \title{Retrieve current month usage for your account.}
 \usage{
-accountUsage(type)
+accountUsage(type = "")
 }
 \arguments{
 \item{type}{"messages" | "rules" | "rule-records" | alterts" | "alert-records"}

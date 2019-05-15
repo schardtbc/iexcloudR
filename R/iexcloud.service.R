@@ -1,15 +1,33 @@
 
+#' return first argument that is not null
+#'
+#' @export
+coalesce <- function(a,b,...) {
+  if (!is.null(a)){
+    return(a)
+  }
+  if (missing(b)){
+    return (NULL)
+  }
+  coalesce(b,...)
+}
 
 
 addToken <- function(endpoint){
-  ifelse(stringr::str_detect(endpoint,stringr::fixed("?")),
-         paste0(endpoint, "&token=", getConfig()$token),
-         paste0(endpoint, "?token=", getConfig()$token)
-  )
+  token <- getToken();
+  if (!is.null(token)) {
+    result <- ifelse(stringr::str_detect(endpoint,stringr::fixed("?")),
+                      paste0(endpoint, "&token=", getToken()),
+                      paste0(endpoint, "?token=", getToken())
+                    )
+  } else {
+    stop("missing IEXCLOUD_PRIVATE_KEY value")
+  }
+  return (result)
 };
 
 prefix <- function() {
-  ifelse(substr(config$token,1,1) == "T", getConfig()$sandboxURL, getConfig()$baseURL)
+  ifelse(substr(getToken(),1,1) == "T", getConfig()$sandboxURL, getConfig()$baseURL)
 }
 
 #' construct the url for the api get request
@@ -27,6 +45,7 @@ iex <- function(endpoint) {
   url <- constructURL(endpoint);
   # show(url);
   res <- httr::GET(url);
+  setMessageCount(as.numeric(res$all_headers[[1]]$headers$`iexcloud-messages-used`))
   httr::content(res);
 };
 

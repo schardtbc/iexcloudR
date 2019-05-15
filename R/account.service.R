@@ -1,18 +1,16 @@
 
 
-readRenviron(".env")
-env<-Sys.getenv();
-iexcloud <- env[grep("^IEXCLOUD",names(env))];
-
-
-baseURL = paste0("https://cloud.iexapis.com/",iexcloud["IEXCLOUD_API_VERSION"]);
-
-
 addSk <- function(endpoint){
-  ifelse(stringr::str_detect(endpoint,stringr::fixed("?")),
-         paste0(endpoint, "&token=", iexcloud["IEXCLOUD_SECRET_KEY"]),
-         paste0(endpoint, "?token=", iexcloud["IEXCLOUD_SECRET_KEY"])
+  token <- getConfig()$secretKey;
+  if (!is.null(token)) {
+  result <- ifelse(stringr::str_detect(endpoint,stringr::fixed("?")),
+         paste0(endpoint, "&token=", token),
+         paste0(endpoint, "?token=", token)
   )
+  } else {
+    stop("missing IEXCLOUD_SECRET_KEY value")
+  }
+  return (result)
 };
 
 
@@ -22,8 +20,7 @@ addSk <- function(endpoint){
 #' @return parsed response data, this will usually be a list of key:value pairs from parsed json object
 #' @export
 accountMetaData <- function() {
-  url <- addSk(paste0(baseURL,"/account/metadata"));
-  show(url)
+  url <- addSk(paste0(getConfig()$baseURL,"/account/metadata"));
   res <- httr::GET(url);
   httr::content(res);
 };
@@ -34,8 +31,8 @@ accountMetaData <- function() {
 #' @param type  "messages" | "rules" | "rule-records" | alterts" | "alert-records"
 #' @return parsed response data, this will usually be a list of key:value pairs from parsed json object
 #' @export
-accountUsage <- function(type) {
-  url <- addSk(paste0(baseURL,glue::glue("/account/usage/{type}")));
+accountUsage <- function(type="") {
+  url <- addSk(paste0(getConfig()$baseURL,glue::glue("/account/usage/{type}")));
   res <- httr::GET(url);
   httr::content(res);
 };
@@ -47,11 +44,13 @@ accountUsage <- function(type) {
 #' @return parsed response data, this will usually be a list of key:value pairs from parsed json object
 #' @export
 enablePayAsYouGo <- function() {
-  url <- paste0(baseURL,glue::glue("/account/usage/payasyougo"));
-                  res <- httr::PUT(url,encode="raw",
-                                   body=jsonlite::toJSON(list(token = iexcloud["IEXCLOUD_SECRET_KEY"],
-                                             allow = TRUE),auto_unbox = TRUE),httr::add_headers(Accept = 'application/json', Impersonate = ImpersonateKey));
-                  httr::content(res);
+  url <- paste0(getConfig()$baseURL,"/account/payasyougo");
+  res <- httr::POST(url,config = httr::add_headers(`content-type` = 'application/json'),
+                encode="json",
+                body=jsonlite::toJSON(list(token = getConfig()$secretKey,
+                                           allow = TRUE),auto_unbox = TRUE)
+         );
+  return (res)
 };
 
 #' Used to disable Pay-as-you-go on your account.
@@ -61,9 +60,11 @@ enablePayAsYouGo <- function() {
 #' @return parsed response data, this will usually be a list of key:value pairs from parsed json object
 #' @export
 disablePayAsYouGo <- function() {
-  url <- paste0(baseURL,glue::glue("/account/payasyougo"));
-                  res <- httr::PUT(url,encode="raw",
-                                   body=jsonlite::toJSON(list(token = iexcloud["IEXCLOUD_SECRET_KEY"],
-                                             allow = FALSE),auto_unbox = TRUE),httr::add_headers(Accept = 'application/json', Impersonate = ImpersonateKey));
-                  httr::content(res);
+  url <- paste0(getConfig()$baseURL,"/account/payasyougo");
+  res <- httr::POST(url,config = httr::add_headers(`content-type` = 'application/json'),
+                    encode="json",
+                    body=jsonlite::toJSON(list(token = getConfig()$secretKey,
+                                               allow = FALSE),auto_unbox = TRUE)
+  );
+  return (res)
 };
