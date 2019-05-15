@@ -1,24 +1,37 @@
 
+#' return first argument that is not null
+#'
+#' @export
+coalesce <- function(a,b,...) {
+  if (!is.null(a)){
+    return(a)
+  }
+  if (missing(b)){
+    return (NULL)
+  }
+  coalesce(b,...)
+}
 
-readRenviron(".env")
-env<-Sys.getenv();
-iexcloud <- env[grep("^IEXCLOUD",names(env))];
-
-
-baseURL = paste0("https://cloud.iexapis.com/",iexcloud["IEXCLOUD_API_VERSION"]);
-sandboxURL = paste0("https://sandbox.iexapis.com/",iexcloud["IEXCLOUD_API_VERSION"]);
 
 addToken <- function(endpoint){
-  ifelse(stringr::str_detect(endpoint,stringr::fixed("?")),
-         paste0(endpoint, "&token=", iexcloud["IEXCLOUD_PUBLIC_KEY"]),
-         paste0(endpoint, "?token=", iexcloud["IEXCLOUD_PUBLIC_KEY"])
-  )
+  token <- getToken();
+  if (!is.null(token)) {
+    result <- ifelse(stringr::str_detect(endpoint,stringr::fixed("?")),
+                      paste0(endpoint, "&token=", getToken()),
+                      paste0(endpoint, "?token=", getToken())
+                    )
+  } else {
+    stop("missing IEXCLOUD_PRIVATE_KEY value")
+  }
+  return (result)
 };
 
 prefix <- function() {
-  ifelse(substr(iexcloud["IEXCLOUD_PUBLIC_KEY"],1,1) == "T", sandboxURL, baseURL)
+  ifelse(substr(getToken(),1,1) == "T", getConfig()$sandboxURL, getConfig()$baseURL)
 }
 
+#' construct the url for the api get request
+#' @export
 constructURL <- function(endpoint) {
   paste0(prefix(),addToken(endpoint))
 }
@@ -32,6 +45,7 @@ iex <- function(endpoint) {
   url <- constructURL(endpoint);
   # show(url);
   res <- httr::GET(url);
+  setMessageCount(as.numeric(res$all_headers[[1]]$headers$`iexcloud-messages-used`))
   httr::content(res);
 };
 

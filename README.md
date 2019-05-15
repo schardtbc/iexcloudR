@@ -19,7 +19,7 @@ To install as a dependancy into your project at the R REPL command prompt
 install.github("schardtbc/iexcloudR")
 ```
 
-then in your .env file add the following keys
+then in your .env or .Renviron file add the following keys
 
 ```
 IEXCLOUD_API_VERSION = "beta"
