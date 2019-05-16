@@ -50,14 +50,14 @@ getMessageCount <- function(){
   iexcloud <- as.list(env[grep("^IEXCLOUD",names(env))]);
   config$apiVersion <- coalesce(iexcloud$IEXCLOUD_API_VERSION,"v1")
   config$baseURL <- paste0("https://cloud.iexapis.com/",iexcloud$IEXCLOUD_API_VERSION);
-  config$sandboxURL <= paste0("https://sandbox.iexapis.com/",iexcloud$IEXCLOUD_API_VERSION);
+  config$sandboxURL <- paste0("https://sandbox.iexapis.com/",iexcloud$IEXCLOUD_API_VERSION);
   token = iexcloud$IEXCLOUD_PUBLIC_KEY;
   if (is.null(token)) {
-    warning('IEXCLOUD_PUBLIC_KEY must be provided in envirnment file to access IEX Cloud API')
+    warning('IEXCLOUD_PUBLIC_KEY must be provided in environment file to access IEX Cloud API')
   }
   secret_key = iexcloud$IEXCLOUD_SECRET_KEY;
   if (is.null(secret_key)){
-    warning('IEXCLOUD_SECRET_KEY must be must be provided in envirnment file to access IEX Cloud API')
+    warning('IEXCLOUD_SECRET_KEY must be must be provided in environment file to access IEX Cloud API')
   }
   config$token <- token
   config$secretKey <- secret_key
