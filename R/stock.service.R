@@ -326,16 +326,28 @@ historyFor <- function (symbol,
     endpoint <- paste0(endpoint,'&chartSimplify=true');
   }
   res = iex(endpoint);
-  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
-  df <- tibble::as_tibble(do.call(rbind,data)) %>%
-    tibble::add_column(symbol = symbol,.before=1) %>%
-    tidyr::unnest() %>%
-    dplyr::mutate_at(dplyr::vars(date),dplyr::funs( lubridate::ymd(.)));
-  if (timePeriod == "1d" | timePeriod == 'date') {
-  df <- dplyr::mutate(df, period = lubridate::hm(minute)) %>%
-    dplyr::mutate(dminute = lubridate::period_to_seconds(period - period[1])/60) %>%
-    dplyr::select(-period,-minute) %>%
-    dplyr::rename(minute = dminute);
+  if (length(res) == 0) {
+    df <- tibble::as_tibble(list())
+  } else {
+    data <-
+      lapply(res, function(x) {
+        lapply(x, function(y) {
+          ifelse(is.null(y), NA, y)
+        })
+      })
+
+    df <- tibble::as_tibble(do.call(rbind, data)) %>%
+      tibble::add_column(symbol = symbol, .before = 1) %>%
+      tidyr::unnest() %>%
+      dplyr::mutate_at(dplyr::vars(date), dplyr::funs(lubridate::ymd(.)))
+
+    if (timePeriod == "1d" | timePeriod == 'date') {
+      df <- dplyr::mutate(df, period = lubridate::hm(minute)) %>%
+        dplyr::mutate(dminute = lubridate::period_to_seconds(period - period[1]) / 60) %>%
+        dplyr::select(-period, -minute) %>%
+        dplyr::rename(minute = dminute)
+
+    }
   }
   return (df);
 };
