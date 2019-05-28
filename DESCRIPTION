@@ -1,7 +1,7 @@
 Package: iexcloudR
 Type: Package
 Title: Wrapper for iexcloud Market Data Api
-Version: 0.1.0
+Version: 0.1.1
 Author: Bruce C. Schardt
 Maintainer: Bruce C. Schardt <schardt.bruce.curtis@gmail.com>
 Description: Complete interface to the iexcloud market data api from 

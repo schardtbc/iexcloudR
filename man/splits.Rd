@@ -4,12 +4,10 @@
 \alias{splits}
 \title{Retrieve splits for a symbol}
 \usage{
-splits(symbol, date, type = "daily")
+splits(symbol, period = "next")
 }
 \arguments{
 \item{symbol}{stock symbol}
-
-\item{date}{as string YYYYMMDD, supposed to be optional, but is required at this time}
 
 \item{period}{"next" | "1m" | "3m" | "6m" | "ytd" | "1y" | "2y" | "5y"}
 }

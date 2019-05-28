@@ -2,7 +2,7 @@
 % Please edit documentation in R/stock.service.R
 \name{marketOpenClose}
 \alias{marketOpenClose}
-\title{retrieve the official open and close the market. 15 min delayed}
+\title{retrieve the official open and close for all IEX symbols in the market. 15 min delayed}
 \usage{
 marketOpenClose()
 }
@@ -10,7 +10,7 @@ marketOpenClose()
 df
 }
 \description{
-retrieve the official open and close the market. 15 min delayed
+retrieve the official open and close for all IEX symbols in the market. 15 min delayed
 }
 \examples{
 marketOpenClose()

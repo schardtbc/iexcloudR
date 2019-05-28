@@ -7,7 +7,7 @@
 peersOf(symbol)
 }
 \value{
-symbol a market symbol
+an array of market symbols
 }
 \description{
 Data Weighting: 500 message units per call

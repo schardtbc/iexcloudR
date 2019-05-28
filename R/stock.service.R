@@ -558,14 +558,15 @@ ohlc <- function (symbol) {
   endpoint = glue::glue('/stock/{symbol}/ohlc')
   res = iex(endpoint);
   r <- list(open = res$open$price, openTime = res$open$time, close = res$close$price,
-            closeTime = res$close$time, high=res$high, low = res$low);
+            closeTime = res$close$time, high=ifelse(is.null(res$high),NA,res$high),
+            low = ifelse(is.null(res$low),NA,res$low));
   tibble::as_tibble(r) %>%
   dplyr::mutate(openTime = lubridate::as_datetime(openTime/1000, tz = "America/New_York"),
                 closeTime = lubridate::as_datetime(closeTime/1000, tz = "America/New_York")) %>%
   tibble::add_column(symbol = symbol,.before=1)
 };
 
-#' retrieve the official open and close the market. 15 min delayed
+#' retrieve the official open and close for all IEX symbols in the market. 15 min delayed
 #' @return  df
 #' @export
 #' @examples
@@ -594,12 +595,12 @@ marketOpenClose <- function () {
 #'
 #' Data Weighting: 500 message units per call
 #'
-#' @return  symbol a market symbol
+#' @return  an array of market symbols
 #' @export
 #' @examples
 #' peers('AAPL')
 peersOf <- function (symbol) {
-  endpoint = '/stock/{symbol}/peers'
+  endpoint = glue::glue('/stock/{symbol}/peers')
   res = iex(endpoint);
 };
 
@@ -710,10 +711,17 @@ quoteFor <- function (symbol) {
 #' @examples
 #' socialSentiment("AAPL", "20190206","daily")
 socialSentiment <- function (symbol, date, type="daily") {
+  if (nchar(date) == 10){
+    date=format(lubridate::ymd(date),format = "%Y%Om%d")
+  }
   endpoint <- glue::glue('/stock/{symbol}/sentiment/{type}/{date}');
   res = iex(endpoint);
-  tibble::as_tibble(do.call(rbind,res)) %>%
-    tidyr::unnest();
+  if (type == "daily"){
+    tibble::as_tibble(res)
+  } else {
+    tibble::as_tibble(do.call(rbind,res)) %>%
+      tidyr::unnest();
+  }
 };
 
 #' Analyst Recommendation Summary
@@ -728,11 +736,12 @@ socialSentiment <- function (symbol, date, type="daily") {
 recommendationTrend <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/recommendation-trends');
   res = iex(endpoint);
-  tibble::as_tibble(do.call(rbind,res)) %>%
+  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
+  tibble::as_tibble(do.call(rbind,data)) %>%
     tidyr::unnest() %>%
-  dplyr::mutate(concensusEndDate = lubridate::ymd(lubridate::as_datetime(concensusEndDate/1000)),
-                concensusStartDate = lubridate::ymd(lubridate::as_datetime(concensusStartDate/1000)),
-                corporateActionAppliedDate = lubridate::ymd(lubridate::as_datetime(corporateActionAppliedDate/1000)));
+  dplyr::mutate(consensusEndDate = lubridate::ymd(lubridate::as_datetime(consensusEndDate/1000)),
+                consensusStartDate = lubridate::ymd(lubridate::as_datetime(consensusStartDate/1000)),
+                corporateActionsAppliedDate = lubridate::ymd(lubridate::as_datetime(corporateActionsAppliedDate/1000)));
 };
 
 #' Retrieve splits for a symbol
@@ -744,17 +753,22 @@ recommendationTrend <- function (symbol) {
 #' Data Source(s): EventVestor
 #'
 #' @param symbol stock symbol
-#' @param date as string YYYYMMDD, supposed to be optional, but is required at this time
 #' @param period "next" | "1m" | "3m" | "6m" | "ytd" | "1y" | "2y" | "5y"
 #' @return a dataframe
 #' @export
 #' @examples
 #' splits("AAPL", period = "1m")
-splits <- function (symbol, date, type="daily") {
-  endpoint <- glue::glue('/stock/{symbol}/sentiment/{type}/{date}');
+splits <- function (symbol, period= "next") {
+  endpoint <- glue::glue('/stock/{symbol}/splits/{period}');
   res = iex(endpoint);
-  tibble::as_tibble(do.call(rbind,res)) %>%
-    tidyr::unnest();
+  if (class(res)[[1]] == "xml_document" || length(res) ==0) {
+    tibble::as_tibble(list())
+    } else {
+
+      data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
+      tibble::as_tibble(do.call(rbind,data)) %>%
+      tidyr::unnest();
+    }
 };
 
 #' returns upcoming earnings reportDates for market
@@ -786,7 +800,8 @@ upcomingEarnings<- function(symbol = "market"){
 volumeByVenue <- function(symbol) {
   endpoint <- glue::glue('/stock/{symbol}/volume-by-venue');
   res = iex(endpoint);
-  tibble::as_tibble(do.call(rbind,res)) %>%
+  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
+  tibble::as_tibble(do.call(rbind,data)) %>%
     tidyr::unnest() %>%
     tibble::add_column(symbol = symbol,.before=1);
 }
