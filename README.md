@@ -139,6 +139,13 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 | [X] | News
 | [ ] | Crypto
 
+### Data Points
+|     | Endpoint       | Message Units | per |
+|-----|----------------|---------------:|-----|
+| [X] | List Keys      | 0 | |
+| [X] | Value for Key  | varies | symbol |
+
+
 ### Reference Data
 |     | Endpoint       | Message Units | per |
 |-----|----------------|---------------:|-----|
