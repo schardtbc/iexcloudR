@@ -4,7 +4,7 @@ author: "Bruce Schardt"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{icloudR-vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -12,7 +12,8 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  cache = TRUE
 )
 library(iexcloudR)
 library(tidyquant)
@@ -31,7 +32,7 @@ This is functional wrapper which returns data as tibbles, with a few exceptions.
 
 ## Security Tokens
 
-During resistration at icloud.io you were given security tokens required to access this API. This wrapper will read those tokens from the .env file. The .env file must include the following three key pairs;
+During resistration at icloud.io you were given security tokens required to access this API. This wrapper will read those tokens from the .env (or .Renviron) file. The .env file must include the following three key pairs;
 
 ```
 IEXCLOUD_VERSION = "BETA"
@@ -53,7 +54,7 @@ AAPL<-historyFor("AAPL",timePeriod = "3m")
 ```
 
 ```{r echo=TRUE, fig.height=4, fig.width=6, message=FALSE, warning=FALSE}
-intraday <-historyFor("AAPL",date ="2019-02-15",chartIEXOnly = TRUE)
+intraday <-historyFor("AAPL",date ="2019-05-22",chartIEXOnly = TRUE)
 # Candlestick Chart
  intraday %>%
      ggplot(aes(x = minute, y = close)) +

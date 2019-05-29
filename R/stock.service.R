@@ -15,8 +15,8 @@
 #' balanceSheet("AAPL",period = "quarter", lastN =4)
 balanceSheet <- function (symbol,period = "quarter",lastN=1) {
   endpoint <- glue::glue('/stock/{symbol}/balance-sheet/{lastN}?period={period}');
-  res <- iex(endpoint);
-  data <- res$balancesheet
+  res <- iex_api(endpoint);
+  data <- res$content$balancesheet
   if (!is.null(data) && length(data)>0){
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   result <- tibble::as_tibble(do.call(rbind,data)) %>%
@@ -44,8 +44,8 @@ balanceSheet <- function (symbol,period = "quarter",lastN=1) {
 #' cashflowStatement("AAPL",period = "quarter", lastN =4)
 cashflowStatement <- function (symbol,period = "quarter",lastN=1) {
   endpoint <- glue::glue('/stock/{symbol}/cash-flow/{lastN}?period={period}');
-  res = iex(endpoint);
-  data <- res$cashflow
+  res = iex_api(endpoint);
+  data <- res$content$cashflow
   if (!is.null(data) && length(data)>0){
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   result <- tibble::as_tibble(do.call(rbind,data)) %>%
@@ -68,21 +68,31 @@ cashflowStatement <- function (symbol,period = "quarter",lastN=1) {
 #' @examples
 #' company("AAPL")
 company <- function (symbol) {
-  endpoint <- glue::glue('/stock/{symbol}/company');
-  res = iex(endpoint);
-  if (class(res)[[1]] != "xml_document") {
-  data <- lapply(res,function(x) {ifelse(is.null(x),NA,x)});
-  result <- tibble::as_tibble(do.call(cbind,data)) %>% dplyr::select(-tags) %>% tidyr::unnest() %>% dplyr::distinct();
-  if (length(res$tags)>0){
-     result<-tibble::add_column(result,tags = do.call(paste,c(res$tags, sep="; ")));
+  endpoint <- glue::glue('/stock/{symbol}/company')
+
+  res = iex_api(endpoint)
+
+  if (!res$status) {
+    data <- lapply(res$content, function(x) {
+      ifelse(is.null(x), NA, x)
+    })
+
+    result <-
+      tibble::as_tibble(do.call(cbind, data)) %>% dplyr::select(-tags) %>% tidyr::unnest() %>% dplyr::distinct()
+
+    if (length(res$tags) > 0) {
+      result <-
+        tibble::add_column(result, tags = do.call(paste, c(res$tags, sep = "; ")))
+
+    } else {
+      result <- tibble::add_column(result, tags = NA)
+
+    }
   } else {
-    result<-tibble::add_column(result,tags = NA);
+    return (tibble::as_tibble(list()))
   }
-  return (result)
-  } else {
-    return (NULL)
-  }
-};
+}
+
 
 #' Retrieve delayed quote for a symbol as dataframe
 #'
@@ -99,8 +109,12 @@ company <- function (symbol) {
 #' delayedQuote("AAPL")
 delayedQuote <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/quote');
-  res = iex(endpoint);
-  tibble::as_tibble(res)
+  res = iex_api(endpoint);
+  if (!res$status) {
+    tibble::as_tibble(res$content)
+  } else {
+    tibble::as_tibble(list())
+  }
 };
 
 #' Retrieve dividends detail for a symbol as dataframe
@@ -117,11 +131,15 @@ delayedQuote <- function (symbol) {
 #' dividends("AAPL")
 dividends <- function (symbol, timePeriod = "3m") {
   endpoint <- glue::glue('/stock/{symbol}/dividends/{timePeriod}');
-  res = iex(endpoint);
-  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  res = iex_api(endpoint);
+  if (!res$status) {
+  data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
     tidyr::unnest();
+  } else {
+    tibble::as_tibble(list());
+  }
 };
 
 #' Retrieve Earnings data for a given company including the actual EPS, consensus, and fiscal period.
@@ -139,8 +157,9 @@ dividends <- function (symbol, timePeriod = "3m") {
 #' earnings("AAPL", lastN =4)
 earnings <- function (symbol, lastN=1) {
   endpoint <- glue::glue('/stock/{symbol}/earnings/{lastN}/');
-  res = iex(endpoint);
-  data <- res$earnings
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  data <- res$content$earnings
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
@@ -160,8 +179,9 @@ earnings <- function (symbol, lastN=1) {
 #' earningsToday()
 earningsToday <- function (symbol, lastN=1) {
   endpoint <- glue::glue('/stock/market/today-earnings');
-  res = iex(endpoint);
-  df <-lapply(res,function(o) (tibble::as_tibble(do.call(rbind,lapply(o,function(x) {x[["quote"]]<-NULL; x})))))
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  df <-lapply(res$content,function(o) (tibble::as_tibble(do.call(rbind,lapply(o,function(x) {x[["quote"]]<-NULL; x})))))
   df <- tibble::enframe(df) %>% tidyr::unnest()
   df$consensusEPS <-as.numeric(unlist(df$consensusEPS))
   df <- df %>% tidyr::unnest() %>% dplyr::select(-name)
@@ -189,8 +209,9 @@ earningsToday <- function (symbol, lastN=1) {
 #' effectiveSpread("AAPL")
 effectiveSpread <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/effective-spread');
-  res = iex(endpoint);
-  tibble::as_tibble(res)
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  tibble::as_tibble(res$content)
 };
 
 #' Provides the latest consensus estimate for the next fiscal period
@@ -207,8 +228,9 @@ effectiveSpread <- function (symbol) {
 #' estimates("AAPL", lastN =4)
 estimates <- function (symbol, lastN=1) {
   endpoint <- glue::glue('/stock/{symbol}/estimates/{lastN}/');
-  res = iex(endpoint);
-  data <- res$estimates;
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  data <- res$content$estimates;
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
@@ -227,8 +249,9 @@ estimates <- function (symbol, lastN=1) {
 #' financials("AAPL", lastN =4)
 financials <- function (symbol, lastN=1) {
   endpoint <- glue::glue('/stock/{symbol}/financials/{lastN}/');
-  res = iex(endpoint);
-  data <- res$financials
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  data <- res$content$financials
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
@@ -249,8 +272,9 @@ financials <- function (symbol, lastN=1) {
 #' fundOwnership("AAPL")
 fundOwnership <- function (symbol, lastN=1) {
   endpoint <- glue::glue('/stock/{symbol}/fund-ownership/');
-  res = iex(endpoint);
-  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
     tidyr::unnest() %>%
@@ -284,74 +308,86 @@ fundOwnership <- function (symbol, lastN=1) {
 #' @examples
 #' history("AAPL")
 historyFor <- function (symbol,
-                     timePeriod = "1m",
-                     chartCloseOnly = FALSE,
-                     chartIEXOnly = FALSE,
-                     chartLastN = 0,
-                     chartInterval = 1,
-                     changeFromClose = FALSE,
-                     chartReset = FALSE,
-                     chartSimplify = FALSE,
-                     date = "") {
-  if (class(date)=="Date"){
-    date=format(date,"%Y%Om%d");
+                        timePeriod = "1m",
+                        chartCloseOnly = FALSE,
+                        chartIEXOnly = FALSE,
+                        chartLastN = 0,
+                        chartInterval = 1,
+                        changeFromClose = FALSE,
+                        chartReset = FALSE,
+                        chartSimplify = FALSE,
+                        date = "") {
+  if (class(date) == "Date") {
+    date = format(date, "%Y%Om%d")
+
   }
-  if (nchar(date)==8 | nchar(date)==10){
-    timePeriod='date';
-    if (nchar(date) == 10){
-    date=format(lubridate::ymd(date),format = "%Y%Om%d")
+  if (nchar(date) == 8 | nchar(date) == 10) {
+    timePeriod = 'date'
+
+    if (nchar(date) == 10) {
+      date = format(lubridate::ymd(date), format = "%Y%Om%d")
     }
   }
-  endpoint <- glue::glue('/stock/{symbol}/chart/{timePeriod}');
-  if (nchar(date)==8){
-    endpoint = paste0(endpoint,"/",date);
+  endpoint <- glue::glue('/stock/{symbol}/chart/{timePeriod}')
+
+  if (nchar(date) == 8) {
+    endpoint = paste0(endpoint, "/", date)
+
   }
-  endpoint = paste0(endpoint,glue::glue('?chartCloseOnly={chartCloseOnly}'));
+  endpoint = paste0(endpoint, glue::glue('?chartCloseOnly={chartCloseOnly}'))
+
   if (chartLastN > 0) {
-    endpoint <- paste0(endpoint,glue::glue('&chartLast=${chartLastN}'));
+    endpoint <- paste0(endpoint, glue::glue('&chartLast=${chartLastN}'))
+
   }
-  if ((timePeriod=="1d" | timePeriod=="date" ) & chartIEXOnly){
-    endpoint <- paste0(endpoint,'&chartIEXOnly=true');
+  if ((timePeriod == "1d" | timePeriod == "date") & chartIEXOnly) {
+    endpoint <- paste0(endpoint, '&chartIEXOnly=true')
+
   }
   if (chartInterval > 1) {
-    endpoint <- paste0(endpoint,glue::glue('&chartInterval=${chartInterval}'));
+    endpoint <-
+      paste0(endpoint, glue::glue('&chartInterval=${chartInterval}'))
+
   }
   if (changeFromClose) {
-    endpoint <- paste0(endpoint,'&changeFromClose=true');
+    endpoint <- paste0(endpoint, '&changeFromClose=true')
+
   }
   if (chartReset) {
-    endpoint <- paste0(endpoint,'&chartReset=true');
+    endpoint <- paste0(endpoint, '&chartReset=true')
+
   }
   if (chartSimplify) {
-    endpoint <- paste0(endpoint,'&chartSimplify=true');
+    endpoint <- paste0(endpoint, '&chartSimplify=true')
+
   }
-  res = iex(endpoint);
-  if (length(res) == 0) {
-    df <- tibble::as_tibble(list())
-  } else {
-    data <-
-      lapply(res, function(x) {
-        lapply(x, function(y) {
-          ifelse(is.null(y), NA, y)
-        })
+  res = iex_api(endpoint)
+
+  if (res$status)
+    return (tibble::as_tibble(list()))
+  data <-
+    lapply(res$content, function(x) {
+      lapply(x, function(y) {
+        ifelse(is.null(y), NA, y)
       })
+    })
 
-    df <- tibble::as_tibble(do.call(rbind, data)) %>%
-      tibble::add_column(symbol = symbol, .before = 1) %>%
-      tidyr::unnest() %>%
-      dplyr::mutate_at(dplyr::vars(date), dplyr::funs(lubridate::ymd(.)))
+  df <- tibble::as_tibble(do.call(rbind, data)) %>%
+    tibble::add_column(symbol = symbol, .before = 1) %>%
+    tidyr::unnest() %>%
+    dplyr::mutate_at(dplyr::vars(date), dplyr::funs(lubridate::ymd(.)))
 
-    if (timePeriod == "1d" | timePeriod == 'date') {
-      df <- dplyr::mutate(df, period = lubridate::hm(minute)) %>%
-        dplyr::mutate(dminute = lubridate::period_to_seconds(period - period[1]) / 60) %>%
-        dplyr::select(-period, -minute) %>%
-        dplyr::rename(minute = dminute)
+  if (timePeriod == "1d" | timePeriod == 'date') {
+    df <-
+      dplyr::mutate(df, period = lubridate::period_to_seconds(lubridate::hm(minute))) %>%
+      dplyr::mutate(dminute = (period - dplyr::first(period)) / 60) %>%
+      dplyr::select(-period,-minute) %>%
+      dplyr::rename(minute = dminute)
 
-    }
   }
-  return (df);
-};
+  return (df)
 
+}
 
 
 #' Returns Insider Transactions
@@ -365,8 +401,9 @@ historyFor <- function (symbol,
 #' insiderTransactions("AAPL")
 insiderTransactions <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/insider-transactions');
-  res = iex(endpoint);
-  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
     tidyr::unnest() %>%
@@ -388,8 +425,8 @@ insiderTransactions <- function (symbol) {
 #' insiderRoster("AAPL")
 insiderRoster <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/insider-roster');
-  res = iex(endpoint);
-  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  res = iex_api(endpoint);
+  data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
     tidyr::unnest() %>%
@@ -407,8 +444,8 @@ insiderRoster <- function (symbol) {
 #' insiderSummary("AAPL")
 insiderSummary <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/insider-summary');
-  res = iex(endpoint);
-  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
+  res = iex_api(endpoint);
+  data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
     tidyr::unnest()
@@ -431,8 +468,9 @@ insiderSummary <- function (symbol) {
 #' incomeStatement("AAPL",period = "quarter", lastN =4)
 incomeStatement <- function (symbol,period = "quarter",lastN=1) {
   endpoint <- glue::glue('/stock/{symbol}/income/{lastN}?period={period}');
-  res = iex(endpoint);
-  data <- res$income;
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  data <- res$content$income;
   if (!is.null(data) && length(data)>0){
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   result <-tibble::as_tibble(do.call(rbind,data)) %>%
@@ -456,13 +494,9 @@ incomeStatement <- function (symbol,period = "quarter",lastN=1) {
 #' keyStats("AAPL")
 keyStats <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/stats');
-  res = iex(endpoint);
-  res_class <- class(res);
-  if (length(res_class) >1 || res_class != "list") {
-    # message(paste(symbol," Unknown"),"\r",appendLF=FALSE);
-    return (tibble::as_tibble());
-  }
-  data <- lapply(res,function(y) {ifelse(is.null(y),NA,y[[1]])});
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  data <- lapply(res$content,function(y) {ifelse(is.null(y),NA,y[[1]])});
   tibble::as_tibble(data) %>%
   tibble::add_column(symbol = symbol,.before=1)
 };
@@ -478,8 +512,9 @@ keyStats <- function (symbol) {
 #' keyStats("AAPL")
 advancedStats <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/advanced-stats');
-  res = iex(endpoint);
-  data <- lapply(res,function(y) {ifelse(is.null(y),NA,y[[1]])});
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  data <- lapply(res$content,function(y) {ifelse(is.null(y),NA,y[[1]])});
   tibble::as_tibble(data)  %>%
     tibble::add_column(symbol = symbol,.before=1)
 };
@@ -495,8 +530,9 @@ advancedStats <- function (symbol) {
 #' largestTrades("mostactive")
 largestTrades <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol/largest-trades');
-  res = iex(endpoint);
-  tibble::as_tibble(do.call(rbind,res)) %>%
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  tibble::as_tibble(do.call(rbind,res$content)) %>%
   tibble::add_column(symbol = symbol,.before=1)
 };
 
@@ -509,8 +545,9 @@ largestTrades <- function (symbol) {
 #' listOf("mostactive")
 listOf <- function (listType = "mostactive") {
   endpoint <- glue::glue('/stock/market/list/{listType}');
-  res = iex(endpoint);
-  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tidyr::unnest();
 };
@@ -526,7 +563,8 @@ listOf <- function (listType = "mostactive") {
 #' logo("AAPL")
 logoFor <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/logo');
-  iex(endpoint);
+  res <- iex_api(endpoint);
+  res <- res$content;
 };
 
 #' Retrieve real time traded volume on U.S. markets.
@@ -536,8 +574,9 @@ logoFor <- function (symbol) {
 #' marketVolumn()
 marketVolume <- function () {
   endpoint <- '/market';
-  res = iex(endpoint);
-  tibble::as_tibble(do.call(rbind,res)) %>%
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  tibble::as_tibble(do.call(rbind,res$content)) %>%
     tidyr::unnest();
 };
 
@@ -555,8 +594,9 @@ newsFor <- function (subject,lastN = 5) {
   } else {
     endpoint = glue::glue("/stock/{subject}/news/last/{lastN}")
   }
-  res = iex(endpoint);
-  tibble::as_tibble(do.call(rbind,res)) %>%
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  tibble::as_tibble(do.call(rbind,res$content)) %>%
   tidyr::unnest() %>%
   tibble::add_column(symbol = subject,.before=1)
 };
@@ -568,7 +608,9 @@ newsFor <- function (subject,lastN = 5) {
 #' ohlc('AAPL')
 ohlc <- function (symbol) {
   endpoint = glue::glue('/stock/{symbol}/ohlc')
-  res = iex(endpoint);
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  res <- res$content;
   r <- list(open = res$open$price, openTime = res$open$time, close = res$close$price,
             closeTime = res$close$time, high=ifelse(is.null(res$high),NA,res$high),
             low = ifelse(is.null(res$low),NA,res$low));
@@ -585,8 +627,9 @@ ohlc <- function (symbol) {
 #' marketOpenClose()
 marketOpenClose <- function () {
   endpoint = '/stock/market/ohlc'
-  response = iex(endpoint);
-  records <- lapply(response,function(res) {list(open = ifelse(is.null(res$open$price),NA,res$open$price),
+  response = iex_api(endpoint);
+  if (response$status) return (tibble::as_tibble(list()))
+  records <- lapply(response$content,function(res) {list(open = ifelse(is.null(res$open$price),NA,res$open$price),
                                                  openTime = ifelse(is.null(res$open$time),NA,res$open$time),
                                                  close = ifelse(is.null(res$close$price),NA,res$close$price),
                                                  closeTime = ifelse(is.null(res$close$time),NA,res$close$time)
@@ -613,7 +656,9 @@ marketOpenClose <- function () {
 #' peers('AAPL')
 peersOf <- function (symbol) {
   endpoint = glue::glue('/stock/{symbol}/peers')
-  res = iex(endpoint);
+  res = iex_api(endpoint);
+  if (res$status) return (list())
+  res$content
 };
 
 #' Retrieve previous day adjusted price data for one or more stocks
@@ -627,8 +672,9 @@ peersOf <- function (symbol) {
 #' previousDay("AAPL")
 previousDay <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/previous');
-  res = iex(endpoint);
-  tibble::as_tibble(res)
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  tibble::as_tibble(res$content)
 };
 
 #' Retrieve previous day adjusted price data for one or more stocks
@@ -664,7 +710,9 @@ dailyTimeSeriesAdapter <- function (df) {
 #' priceOf("AAPL")
 priceOf <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/price');
-  iex(endpoint);
+  res <-iex_api(endpoint);
+  if (res$status) return (NA)
+  res$content
 };
 
 #' Retrieve the latest avg, high, and low analyst price target for a symbol.
@@ -678,8 +726,9 @@ priceOf <- function (symbol) {
 #' priceTarget("AAPL")
 priceTarget <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/price-target');
-  res = iex(endpoint);
-  tibble::as_tibble(res)
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  tibble::as_tibble(res$content)
 };
 
 #' retrieve quote detail for a symbol as dataframe
@@ -693,14 +742,10 @@ priceTarget <- function (symbol) {
 #' quoteFor("AAPL")
 quoteFor <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/quote');
-  res <- iex(endpoint);
-  res_class = class(res);
-  if (length(res_class) >1 || res_class != "list") {
-    message(paste(symbol," Unknown"),"\r",appendLF=FALSE)
-    return (tibble::as_tibble(list()))
-    }
-  res <- lapply(res, function(x) { ifelse( is.null(x),NA,x)})
-  tibble::as_tibble(res)
+  res <- iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  data <- lapply(res$content, function(x) { ifelse( is.null(x),NA,x)})
+  tibble::as_tibble(data)
 };
 
 #' Retrieve Social Sentiment Data from StockTwits. Data can be viewed as a daily value, or by minute for a given date.
@@ -727,11 +772,12 @@ socialSentiment <- function (symbol, date, type="daily") {
     date=format(lubridate::ymd(date),format = "%Y%Om%d")
   }
   endpoint <- glue::glue('/stock/{symbol}/sentiment/{type}/{date}');
-  res = iex(endpoint);
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
   if (type == "daily"){
-    tibble::as_tibble(res)
+    tibble::as_tibble(res$content)
   } else {
-    tibble::as_tibble(do.call(rbind,res)) %>%
+    tibble::as_tibble(do.call(rbind,res$content)) %>%
       tidyr::unnest();
   }
 };
@@ -747,8 +793,9 @@ socialSentiment <- function (symbol, date, type="daily") {
 #' recommendationTrends("AAPL")
 recommendationTrend <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/recommendation-trends');
-  res = iex(endpoint);
-  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tidyr::unnest() %>%
   dplyr::mutate(consensusEndDate = lubridate::ymd(lubridate::as_datetime(consensusEndDate/1000)),
@@ -770,26 +817,35 @@ recommendationTrend <- function (symbol) {
 #' @export
 #' @examples
 #' splits("AAPL", period = "1m")
-splits <- function (symbol, period= "next") {
-  endpoint <- glue::glue('/stock/{symbol}/splits/{period}');
-  res = iex(endpoint);
-  if (class(res)[[1]] == "xml_document" || length(res) ==0) {
-    tibble::as_tibble(list())
-    } else {
+splits <- function (symbol, period = "next") {
+  endpoint <- glue::glue('/stock/{symbol}/splits/{period}')
 
-      data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
-      tibble::as_tibble(do.call(rbind,data)) %>%
-      tidyr::unnest();
-    }
-};
+  res = iex_api(endpoint)
+
+  if (res$status)
+    return (tibble::as_tibble(list()))
+  data <-
+    lapply(res, function(x) {
+      lapply(x, function(y) {
+        ifelse(is.null(y), NA, y[[1]])
+      })
+    })
+
+  tibble::as_tibble(do.call(rbind, data)) %>%
+    tidyr::unnest()
+
+
+}
+
 
 #' returns upcoming earnings reportDates for market
 #'
 #' @export
 upcomingEarnings<- function(symbol = "market"){
   endpoint <- glue::glue("/stock/{symbol}/upcoming-earnings")
-  res = iex(endpoint)
-  tibble::as_tibble(do.call(rbind,res)) %>%
+  res = iex_api(endpoint)
+  if (res$status) return (tibble::as_tibble(list()))
+  tibble::as_tibble(do.call(rbind,res$content)) %>%
     tidyr::unnest() %>% dplyr::arrange(symbol)
 }
 
@@ -811,8 +867,9 @@ upcomingEarnings<- function(symbol = "market"){
 #' volumeByVenue('AAPL')
 volumeByVenue <- function(symbol) {
   endpoint <- glue::glue('/stock/{symbol}/volume-by-venue');
-  res = iex(endpoint);
-  data <- lapply(res,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
+  res = iex_api(endpoint);
+  if (res$status) return (tibble::as_tibble(list()))
+  data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tidyr::unnest() %>%
     tibble::add_column(symbol = symbol,.before=1);

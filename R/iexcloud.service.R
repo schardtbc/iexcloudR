@@ -49,6 +49,58 @@ iex <- function(endpoint) {
   httr::content(res);
 };
 
+#' Perform a get request to an endpoint on the iexcloud server
+#'
+#' @param endpoint a string which will form the variable are of the endpoint URL
+#' @return iex_api class parsed response data, this will usually be a list of key:value pairs from parsed json object
+#' @export
+iex_api <- function(endpoint) {
+  url <- constructURL(endpoint);
+  # show(url);
+  resp <- httr::GET(url);
+  msg_count <- as.numeric(resp$all_headers[[1]]$headers$`iexcloud-messages-used`);
+  setMessageCount(msg_count)
+  parsed <- list()
+  if (httr::http_error(resp)) {
+    warning(
+      sprintf(
+        "IEX API request failed [%s]\n%s\n%s\n%s",
+        httr::status_code(resp),
+        httr::content(resp, "text"),
+        "endpoint requested:",
+        endpoint
+      ),
+      call. = FALSE
+    )
+  } else {
+
+  if (httr::http_type(resp) != "application/json") {
+    warning(
+      sprintf(
+        "IEX API did not return json\n%s",
+        httr::content(resp, "text")
+      ),
+      call. = FALSE
+    );
+    parsed <- list();
+  } else {
+    parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = FALSE)
+  }
+  }
+
+  structure(
+    list(
+      status = httr::http_error(resp),
+      iexcloud_messages_used = msg_count,
+      content = parsed,
+      endpoint = endpoint,
+      response = resp
+    ),
+    class = "iex_api"
+  )
+
+};
+
 
 # #' Perform a get request to an endpoint on the iexcloud server, will show the complete url
 # #' including security token being sent to the server for debug
@@ -72,3 +124,15 @@ iexRaw <- function(endpoint) {
   httr::GET(url);
 };
 #
+
+#' print S3 function for iex_api class
+#' @export
+print.iex_api <- function(x, ...){
+  cat("<IEX ", x$endpoint, " >\n", sep = "")
+  if (x$status) {
+    cat("IEX Failed, Encountered HTTP_ERROR")
+  } else {
+      str(x$content)
+  }
+  invisible(x)
+}

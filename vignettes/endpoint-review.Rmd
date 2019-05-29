@@ -1,0 +1,164 @@
+---
+title: "IEX Endpoint Review"
+author: "Bruce Schardt"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{IEX Endpoint Review}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  cache = TRUE
+)
+library(knitr)
+library(iexcloudR)
+exported_symbols <- ls(package:iexcloudR)
+```
+
+### Exported Symbols
+
+```{r exported-symbols,echo=FALSE}
+exported_symbols
+```
+
+
+
+
+Example code sample and output expected for each Endpoint
+
+### Company
+
+```{r company}
+res <- company("AAPL")
+res
+```
+
+### Quote
+
+```{r quote}
+res <- quoteFor("AAPL")
+res
+```
+
+### Daily Timeseries History
+
+```{r daily-timeseries}
+res <- historyFor("AAPL","1m")
+res
+```
+
+### Intraday TimeSeries
+```{r intraday-timeseries} 
+# 30 previous days data can be queried
+res <- historyFor("AAPL",date = "2019-05-22")
+res
+```
+
+### Key Statistics
+
+```{r key-stats}
+res <- keyStats("AAPL")
+res
+```
+
+### Advanced Stats
+
+```{r advanced-stats}
+res <-advancedStats("AAPL")
+res
+```
+
+
+
+### Balance Sheet Statement
+
+```{r balance-sheet}
+res <- balanceSheet("AAPL", lastN = 5)
+res
+```
+
+### Cashflow Statement
+
+```{r cashflow}
+res<-cashflowStatement("AAPL", lastN = 5)
+res
+```
+
+### Income Statement
+
+```{r income-statement}
+res<-incomeStatement("AAPL", lastN = 5)
+res
+```
+
+
+### Financials
+
+```{r financial-statement}
+res <- financials("AAPL")
+res
+```
+
+### Earnings
+
+```{r earnings}
+res <- earnings("AAPL")
+res
+```
+
+### Dividends
+
+```{r dividends}
+res <- dividends("AAPL")
+res
+```
+
+### Price Target
+
+```{r price-target}
+res <- priceTarget("AAPL")
+res
+```
+
+
+### Peers
+
+```{r peers}
+res <- peersOf("AAPL")
+str(res)
+```
+
+### Volume by Venue
+
+```{r volume-by-venue}
+res <- volumeByVenue("AAPL")
+res
+```
+
+### Insider Roster
+
+```{r insider-roster}
+res <- insiderRoster("AAPL")
+res
+```
+
+### Insider Summary
+
+```{r insider-summary}
+res <- insiderSummary("AAPL")
+res
+```
+
+### Insider Transactions
+
+```{r insider-transactions}
+res <- insiderTransactions("AAPL")
+res
+```
+
+
