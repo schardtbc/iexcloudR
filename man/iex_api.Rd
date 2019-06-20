@@ -7,7 +7,8 @@
 iex_api(endpoint)
 }
 \arguments{
-\item{endpoint}{a string which will form the variable are of the endpoint URL}
+\item{endpoint}{a "url" object or a character string which will form the variable part of the endpoint URL
+for a discussion of url objects see httr::build_url}
 }
 \value{
 iex_api class parsed response data, this will usually be a list of key:value pairs from parsed json object

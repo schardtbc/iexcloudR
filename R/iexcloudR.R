@@ -1,3 +1,4 @@
+#' @details
 #' icloudR: A wrapper for the IEX Cloud API
 #'
 #' ##What is IEX Cloud?
@@ -22,12 +23,13 @@
 #' following three key pairs: note(put .env in your .gitignore file)
 #'
 #' ```
-#' IEXCLOUD_VERSION = "BETA"
+#' IEXCLOUD_VERSION = "stable"
 #' IEXCLOUD_PRIVATE_KEY = "pk_.........."
 #' IEXCLOUD_SECRET_KEY  = "sk_.........."
 #' ```
 #'
 #' @docType package
 #' @name iexcloudR
+#' @keywords internal
 #' @author Bruce C. Schardt, \email{schardt.bruce.curtis@@gmail.com}
-NULL
+"_PACKAGE"

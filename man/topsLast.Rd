@@ -26,3 +26,7 @@ Data Source(s): Consolidated Tape Investors Exchange
 \examples{
 topsLast('AAPL')
 }
+\seealso{
+Other tops service functions: \code{\link{tops}}
+}
+\concept{tops service functions}

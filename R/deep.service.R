@@ -19,6 +19,7 @@
 #'
 #'Data Source(s): Consolidated Tape Investors Exchange
 #'
+#' @family deep service functions
 #' @param symbol a market symbol, one and only one symbol
 #' @export
 #' @examples
@@ -50,6 +51,7 @@
   #'
   #'Data Source(s): Consolidated Tape Investors Exchange
   #'
+  #' @family deep service functions
   #' @param symbol a market symbol, one and only one symbol
   #' @export
   #' @examples
@@ -69,6 +71,7 @@
   #'
   #'Data Source(s): Investors Exchange
   #'
+  #' @family deep service functions
   #' @param symbol a market symbol, one and only one symbol
   #' @export
   #' @examples
@@ -89,6 +92,7 @@
   #'
   #' Data Source(s): Investors Exchange
   #'
+  #' @family deep service functions
   #' @param symbol a market symbol, one and only one symbol
   #' @export
   #' @examples

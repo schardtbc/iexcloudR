@@ -1,6 +1,6 @@
 
 #' return first argument that is not null
-#'
+#' @keywords internal
 #' @export
 coalesce <- function(a,b,...) {
   if (!is.null(a)){
@@ -31,32 +31,40 @@ prefix <- function() {
 }
 
 #' construct the url for the api get request
+#' @keywords internal
 #' @export
 constructURL <- function(endpoint) {
-  paste0(prefix(),addToken(endpoint))
+  if (is(endpoint,"url")){
+    endpoint$host <- prefix();
+    endpoint$scheme <- "https"
+    endpoint$query$token <- getToken();
+    httr::build_url(endpoint)
+  } else {
+    paste0(prefix(),addToken(endpoint))
+  }
 }
 
-#' Perform a get request to an endpoint on the iexcloud server
-#'
-#' @param endpoint a string which will form the variable are of the endpoint URL
-#' @return parsed response data, this will usually be a list of key:value pairs from parsed json object
-#' @export
-iex <- function(endpoint) {
-  url <- constructURL(endpoint);
-  # show(url);
-  res <- httr::GET(url);
-  setMessageCount(as.numeric(res$all_headers[[1]]$headers$`iexcloud-messages-used`))
-  httr::content(res);
-};
+# #' Perform a get request to an endpoint on the iexcloud server
+# #'
+# #' @param endpoint a string which will form the variable are of the endpoint URL
+# #' @return parsed response data, this will usually be a list of key:value pairs from parsed json object
+# #' @export
+# iex <- function(endpoint) {
+#   url <- constructURL(endpoint);
+#   # show(url);
+#   res <- httr::GET(url);
+#   setMessageCount(as.numeric(res$all_headers[[1]]$headers$`iexcloud-messages-used`))
+#   httr::content(res);
+# };
 
 #' Perform a get request to an endpoint on the iexcloud server
 #'
-#' @param endpoint a string which will form the variable are of the endpoint URL
+#' @param endpoint a "url" object or a character string which will form the variable part of the endpoint URL
+#'    for a discussion of url objects see httr::build_url
 #' @return iex_api class parsed response data, this will usually be a list of key:value pairs from parsed json object
 #' @export
 iex_api <- function(endpoint) {
   url <- constructURL(endpoint);
-  # show(url);
   resp <- httr::GET(url);
   msg_count <- as.numeric(resp$all_headers[[1]]$headers$`iexcloud-messages-used`);
   setMessageCount(msg_count)
@@ -126,6 +134,7 @@ iexRaw <- function(endpoint) {
 #
 
 #' print S3 function for iex_api class
+#' @keywords internal
 #' @export
 print.iex_api <- function(x, ...){
   cat("<IEX ", x$endpoint, " >\n", sep = "")

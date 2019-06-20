@@ -4,11 +4,16 @@
 \name{iexcloudR}
 \alias{iexcloudR}
 \alias{iexcloudR-package}
-\title{icloudR: A wrapper for the IEX Cloud API}
+\title{iexcloudR: Wrapper for iexcloud Market Data Api}
 \description{
-##What is IEX Cloud?
+Complete interface to the iexcloud market data api from 
+    IEX Group Inc. The Investors Exchange.
 }
 \details{
+icloudR: A wrapper for the IEX Cloud API
+
+##What is IEX Cloud?
+
 The IEXCloud is a micropayment Api for financial and stock quote data.
 The Api is hosted by IEX Group Inc. \href{https://iextrading.com/}{The Investors Exchange}.
 Using the Api requires \href{https://iexcloud.io/cloud-login#/register}{registration}.
@@ -25,7 +30,7 @@ micropayment cost of each function call.Security Tokens
 
 During resistration at icloud.io you were given security tokens required to access this API.
 This wrapper will read those tokens from the .env file. The .env file must include the
-following three key pairs: note(put .env in your .gitignore file)\preformatted{IEXCLOUD_VERSION = "BETA"
+following three key pairs: note(put .env in your .gitignore file)\preformatted{IEXCLOUD_VERSION = "stable"
 IEXCLOUD_PRIVATE_KEY = "pk_.........."
 IEXCLOUD_SECRET_KEY  = "sk_.........."
 }
@@ -33,3 +38,4 @@ IEXCLOUD_SECRET_KEY  = "sk_.........."
 \author{
 Bruce C. Schardt, \email{schardt.bruce.curtis@gmail.com}
 }
+\keyword{internal}

@@ -9,3 +9,4 @@ coalesce(a, b, ...)
 \description{
 return first argument that is not null
 }
+\keyword{internal}

@@ -13,6 +13,7 @@
 #'
 #' Data Source(s): Consolidated Tape Investors Exchange
 #'
+#' @family tops service functions
 #' @param symbol a market symbol, when absent will return all market symbols
 #' @param securityType | NULL filter
 #' @param sector | NULL filter
@@ -65,6 +66,7 @@ tops <- function(symbol ="", securityType = NULL, sector = NULL) {
 #'
 #'Data Source(s): Consolidated Tape Investors Exchange
 #'
+#' @family tops service functions
 #' @param symbol a market symbol, when absent returns all market symbols
 #' @export
 #' @examples

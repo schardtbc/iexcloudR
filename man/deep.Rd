@@ -32,3 +32,8 @@ Data Source(s): Consolidated Tape Investors Exchange
 \examples{
 deep('AAPL')
 }
+\seealso{
+Other deep service functions: \code{\link{deepAuction}},
+  \code{\link{deepOfficialPrice}}, \code{\link{deepTrades}}
+}
+\concept{deep service functions}

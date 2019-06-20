@@ -1,5 +1,7 @@
 
 #' get all data-point keys for a symbol
+#'
+#' @family data point service functions
 #' @param symbol a market symbol
 #' @export
 data_point_keys <- function(symbol){
@@ -11,6 +13,8 @@ data_point_keys <- function(symbol){
 }
 
 #' data-point for symbol key
+#'
+#' @family data point service functions
 #' @param symbol a market symbol
 #' @param key a data-point key
 #' @export

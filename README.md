@@ -145,6 +145,11 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 | [X] | List Keys      | 0 | |
 | [X] | Value for Key  | varies | symbol |
 
+### Time Series
+|     | Endpoint       | Message Units | per |
+|-----|----------------|---------------:|-----|
+| [X] | List time-series ids      | 0 | |
+| [X] | Value for time-series id  | varies | record |
 
 ### Reference Data
 |     | Endpoint       | Message Units | per |

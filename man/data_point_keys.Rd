@@ -12,3 +12,7 @@ data_point_keys(symbol)
 \description{
 get all data-point keys for a symbol
 }
+\seealso{
+Other data point service functions: \code{\link{data_point}}
+}
+\concept{data point service functions}

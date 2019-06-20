@@ -9,3 +9,4 @@ constructURL(endpoint)
 \description{
 construct the url for the api get request
 }
+\keyword{internal}

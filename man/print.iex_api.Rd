@@ -9,3 +9,4 @@
 \description{
 print S3 function for iex_api class
 }
+\keyword{internal}

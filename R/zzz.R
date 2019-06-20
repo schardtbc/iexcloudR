@@ -48,7 +48,7 @@ getMessageCount <- function(){
 
   env<-Sys.getenv();
   iexcloud <- as.list(env[grep("^IEXCLOUD",names(env))]);
-  config$apiVersion <- coalesce(iexcloud$IEXCLOUD_API_VERSION,"v1")
+  config$apiVersion <- coalesce(iexcloud$IEXCLOUD_API_VERSION,"stable")
   config$baseURL <- paste0("https://cloud.iexapis.com/",iexcloud$IEXCLOUD_API_VERSION);
   config$sandboxURL <- paste0("https://sandbox.iexapis.com/",iexcloud$IEXCLOUD_API_VERSION);
   token = iexcloud$IEXCLOUD_PUBLIC_KEY;
