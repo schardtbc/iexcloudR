@@ -22,7 +22,7 @@ install.github("schardtbc/iexcloudR")
 then in your .env or .Renviron file add the following keys
 
 ```
-IEXCLOUD_API_VERSION = "beta"
+IEXCLOUD_API_VERSION = "stable"
 IEXCLOUD_PUBLIC_KEY = "pk_..."
 IEXCLOUD_SECRET_KEY = "sk_..."
 
