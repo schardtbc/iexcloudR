@@ -35,7 +35,7 @@ prefix <- function() {
 #' @export
 constructURL <- function(endpoint) {
   if (is(endpoint,"url")){
-    endpoint$host <- prefix();
+    endpoint$hostname <- gsub("https://","",prefix());
     endpoint$scheme <- "https"
     endpoint$query$token <- getToken();
     httr::build_url(endpoint)
@@ -61,7 +61,7 @@ constructURL <- function(endpoint) {
 #'
 #' @param endpoint a "url" object or a character string which will form the variable part of the endpoint URL
 #'    for a discussion of url objects see httr::build_url
-#' @return iex_api class parsed response data, this will usually be a list of key:value pairs from parsed json object
+#' @return a list, class iex_api, with keys of "status,content,url,iexcloud_messages_used,response
 #' @export
 iex_api <- function(endpoint) {
   url <- constructURL(endpoint);
@@ -137,7 +137,12 @@ iexRaw <- function(endpoint) {
 #' @keywords internal
 #' @export
 print.iex_api <- function(x, ...){
-  cat("<IEX ", x$endpoint, " >\n", sep = "")
+  endpoint <- x$response$url
+  endpoint <- gsub(prefix(),"",endpoint)
+  endpoint <- gsub(getToken(),"",endpoint)
+  endpoint <- gsub("&token=","",endpoint)
+  endpoint <- gsub("?token=","",endpoint)
+  cat("<IEX ", endpoint, " >\n", sep = "")
   if (x$status) {
     cat("IEX Failed, Encountered HTTP_ERROR")
   } else {

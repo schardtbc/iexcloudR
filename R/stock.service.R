@@ -1,5 +1,33 @@
 
 
+#' batch call endpoint
+#'
+#' combines calls for multiple symbols and/or endpointd into a single request to the iex_api
+#'
+#' res <- batch_request(symbols = "AAPL","FB","AMZN,"WDC", types = "quote,news")
+#'
+#' the content is accessed from res$content, user will need to reshape the data into dataframes based
+#' on the specifics of the data types requested
+#'
+#' @param symbol a market symbol or "market"
+#' @param types a comma separated list of data types to return such as quote,chart,news
+#' @param symbols if symbol is "market" then a commas separated list of market symbols. Max of 100 symbols in a request
+#' @param range if one of the types is chart, then the range parameter for the chart eq. 1d,1m,5y
+#' @param ... Parameters that are sent to individual endpoints can be specified in batch calls and will be applied to each supporting endpoint.
+#' @return a list, class iex_api, with keys of "status,content,url,iexcloud_messages_used,response
+#' @export
+batch_request <- function(symbol = "market", types = NULL, symbols = NULL, range = NULL, ...){
+  endpoint <- list()
+  class(endpoint)<-"url"
+  endpoint$path = glue::glue("/stock/{symbol}/batch");
+  endpoint$query <- list(types = types,
+                         symbols = symbols,
+                         range = range)
+  endpoint$query <- append(endpoint$query,list(...))
+  res <- iex_api(endpoint);
+}
+
+
 #' Pulls balance sheet data. Available quarterly (4 quarters) and annually (4 years)
 #'
 #' Data Weighting: 3000 message units per symbol per period
@@ -28,6 +56,25 @@ balanceSheet <- function (symbol,period = "quarter",lastN=1) {
   }
   return (result)
 };
+
+#' batch calls to market
+#' @param symbol a market symbol or "market"
+#' @param types a comma separated list of data types to return such as quote,chart,news
+#' @param symbols if symbol is "market" then a commas separated list of market symbols
+#' @param range if one of the types is chart, then the range parameter for the chart eq. 1d,1m,5y
+#' @param ... Parameters that are sent to individual endpoints can be specified in batch calls and will be applied to each supporting endpoint.
+#' @export
+batch_request <- function(symbol = "market", types = NULL, symbols = NULL, range = NULL, ...){
+  endpoint <- list()
+  class(endpoint)<-"url"
+  endpoint$path = glue::glue("/stock/{symbol}/batch");
+  endpoint$query <- list(types = types,
+                         symbols = symbols,
+                         range = range)
+  endpoint$query <- append(endpoint$query,list(...))
+  res <- iex_api(endpoint);
+}
+
 
 #' Pulls cash flow data. Available quarterly (4 quarters) and annually (4 years)
 #'

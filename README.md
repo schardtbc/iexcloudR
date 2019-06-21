@@ -91,7 +91,7 @@ Below is a list of the iexcloud APIs that have ([x]) and have not ([ ]) been imp
 |-----|----------------|---------------:|-----|
 | [X] | Advanced Stats | 3020 | per symbol
 | [X] | Balance Sheet |         3000 |per symbol per period |
-| [ ] | Batch Requests |      varies |with data types requested |     
+| [X] | Batch Requests |      varies |with data types requested |     
 | [ ] | Book |                     1 |per symbol   
 | [X] | Cash Flow |             1000 |per symbol per period
 | [ ] | Collections  |             1 |per symbol in  collection

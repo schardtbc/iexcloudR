@@ -11,7 +11,7 @@ iex_api(endpoint)
 for a discussion of url objects see httr::build_url}
 }
 \value{
-iex_api class parsed response data, this will usually be a list of key:value pairs from parsed json object
+a list, class iex_api, with keys of "status,content,url,iexcloud_messages_used,response
 }
 \description{
 Perform a get request to an endpoint on the iexcloud server
