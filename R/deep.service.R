@@ -26,8 +26,11 @@
 #' deep('AAPL')
  deep <- function(symbol) {
   endpoint <- glue::glue('/deep?symbols={symbol}');
-  res = iex(endpoint);
-  tibble::as_tibble(do.call(rbind,res)) %>%
+  res = iex_api(endpoint);
+  if (res$status) {
+    return (tibble::as_tibble(list()))
+  }
+  tibble::as_tibble(do.call(rbind,res$content)) %>%
     tidyr::unnest();
 }
 
@@ -58,8 +61,11 @@
   #' deepAuction('AAPL')\
   deepAuction <- function(symbol) {
   endpoint <- glue::glue('/deep/auction?symbols={symbol}');
-  res = iex(endpoint);
-  tibble::as_tibble(do.call(rbind,res)) %>%
+  res = iex_api(endpoint);
+  if (res$status) {
+    return (tibble::as_tibble(list()))
+  }
+  tibble::as_tibble(do.call(rbind,res$content)) %>%
     tidyr::unnest();
   }
 
@@ -78,9 +84,12 @@
   #' deepOfficialPrice('AAPL')\
   deepOfficialPrice <- function(symbol) {
     endpoint <- glue::glue('/deep/official-price?symbols={symbol}');
-    res <- iex(endpoint);
-    data <- res[symbol];
-    tibble::as_tibble(do.call(rbind,res)) %>%
+    res <- iex_api(endpoint);
+    if (res$status) {
+      return (tibble::as_tibble(list()))
+    }
+    data <- res$content[symbol];
+    tibble::as_tibble(do.call(rbind,data)) %>%
       tidyr::unnest();
   }
 
@@ -99,8 +108,11 @@
   #' deepTrades('AAPL')\
   deepTrades <- function(symbol) {
     endpoint <- glue::glue('/deep/trades?symbols={symbol}');
-    res <- iex(endpoint);
-    data <- res[[symbol]];
+    res <- iex_api(endpoint);
+    if (res$status) {
+      return (tibble::as_tibble(list()))
+    }
+    data <- res$content[[symbol]];
     tibble::as_tibble(do.call(rbind,data)) %>%
       tidyr::unnest() %>%
       dplyr::mutate(datetime = lubridate::with_tz(lubridate::as_datetime(timestamp/1000),"America/New_York")) %>%

@@ -29,8 +29,11 @@ tops <- function(symbol ="", securityType = NULL, sector = NULL) {
   } else {
   endpoint <- glue::glue('/tops?symbols={symbol}');
   }
-  res <- iex(endpoint);
-  result <-tibble::as_tibble(do.call(rbind,res)) %>%
+  res <- iex_api(endpoint);
+  if (res$status) {
+    return (tibble::as_tibble(list()))
+  }
+  result <-tibble::as_tibble(do.call(rbind,res$content)) %>%
     tidyr::unnest()
   if (nchar(symbol)==0) {
     result <- dplyr::filter(result,!(lastSaleTime== 0 & bidPrice == 0 & askPrice == 0 ));
@@ -77,8 +80,11 @@ topsLast <- function(symbol="") {
   } else {
     endpoint <- glue::glue('/tops/last?symbols={symbol}');
   }
-  res = iex(endpoint);
-  result <-tibble::as_tibble(do.call(rbind,res)) %>%
+  res = iex_api(endpoint);
+  if (res$status) {
+    return (tibble::as_tibble(list()))
+  }
+  result <-tibble::as_tibble(do.call(rbind,res$content)) %>%
     tidyr::unnest() %>%
     dplyr::mutate(
       time = lubridate::with_tz(lubridate::as_datetime(time/1000),"America/New_York"),

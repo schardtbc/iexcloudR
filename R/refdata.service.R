@@ -18,8 +18,11 @@ listSymbols <- function (symbolType = "symbols") {
   } else {
     endpoint <- glue::glue('/ref-data/{symbolType}/symbols');
   }
-  res = iex(endpoint);
-  tibble::as_tibble(do.call(rbind,res)) %>% tidyr::unnest()
+  res = iex_api(endpoint);
+  if (res$status) {
+    return (tibble::as_tibble(list()))
+  }
+  tibble::as_tibble(do.call(rbind,res$content)) %>% tidyr::unnest()
 };
 
 #' dataframe of all symbols IEx supports for trading
@@ -27,22 +30,31 @@ listSymbols <- function (symbolType = "symbols") {
 #' @export
 iexSymbols <- function(){
   endpoint <- "/ref-data/iex/symbols"
-  res = iex(endpoint)
-  tibble::as_tibble(do.call(rbind,res)) %>% tidyr::unnest()
+  res = iex_api(endpoint)
+  if (res$status) {
+    return (tibble::as_tibble(list()))
+  }
+  tibble::as_tibble(do.call(rbind,res$content)) %>% tidyr::unnest()
 }
 
 #' @export
 iexExchanges <- function() {
   endpoint <- "/ref-data/exchanges";
-  res = iex(endpoint)
-  tibble::as_tibble(do.call(rbind,res)) %>% tidyr::unnest()
+  res = iex_api(endpoint)
+  if (res$status) {
+    return (tibble::as_tibble(list()))
+  }
+  tibble::as_tibble(do.call(rbind,res$content)) %>% tidyr::unnest()
 }
 
 #' @export
 regionSymbols <- function( region = "US"){
   endpoint <- glue::glue("/ref-data/region/{region}/symbols");
-  res = iex(endpoint)
-  tibble::as_tibble(do.call(rbind,res)) %>% tidyr::unnest()
+  res = iex_api(endpoint)
+  if (!res$status) {
+    return (tibble::as_tibble(list()))
+  }
+  tibble::as_tibble(do.call(rbind,res$content)) %>% tidyr::unnest()
 }
 
 #' @export

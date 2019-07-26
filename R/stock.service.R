@@ -372,7 +372,7 @@ historyFor <- function (symbol,
     timePeriod = 'date'
 
     if (nchar(date) == 10) {
-      date = format(lubridate::ymd(date), format = "%Y%Om%d")
+      date = format(lubridate::ymd(date), format = "%Y%m%d")
     }
   }
   endpoint <- glue::glue('/stock/{symbol}/chart/{timePeriod}')
