@@ -543,6 +543,7 @@ keyStats <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/stats');
   res = iex_api(endpoint);
   if (res$status) return (tibble::as_tibble(list()))
+  if (!is.null(res$content$symbol)) return (tibble::as_tibble(list()))
   data <- lapply(res$content,function(y) {ifelse(is.null(y),NA,y[[1]])});
   tibble::as_tibble(data) %>%
   tibble::add_column(symbol = symbol,.before=1)
