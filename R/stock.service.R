@@ -643,10 +643,13 @@ newsFor <- function (subject,lastN = 5) {
     endpoint = glue::glue("/stock/{subject}/news/last/{lastN}")
   }
   res = iex_api(endpoint);
-  if (res$status) return (tibble::as_tibble(list()))
-  tibble::as_tibble(do.call(rbind,res$content)) %>%
-  tidyr::unnest() %>%
-  tibble::add_column(symbol = subject,.before=1)
+  if (res$status || length(res$content) == 0) return (tibble::as_tibble(list()))
+  result <-lapply(res$content, function(x) {x$symbol <- subject;tibble::as_tibble(x)}) %>%
+     tibble::enframe() %>%
+     tidyr::unnest() %>%
+     dplyr::select(-symbol) %>%
+     tibble::add_column( symbol = subject,.before=1)
+  return (result)
 };
 
 #' retrieve the official open and close for a given symbol.
