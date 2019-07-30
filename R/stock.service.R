@@ -647,6 +647,7 @@ newsFor <- function (subject,lastN = 5) {
   result <-lapply(res$content, function(x) {x$symbol <- subject;tibble::as_tibble(x)}) %>%
      tibble::enframe() %>%
      tidyr::unnest() %>%
+     dplyr::mutate(date = lubridate::as_datetime(datetime/1000.0)) %>%
      dplyr::select(-symbol) %>%
      tibble::add_column( symbol = subject,.before=1)
   return (result)
