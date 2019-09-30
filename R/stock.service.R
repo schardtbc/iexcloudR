@@ -1,32 +1,5 @@
 
 
-#' batch call endpoint
-#'
-#' combines calls for multiple symbols and/or endpointd into a single request to the iex_api
-#'
-#' res <- batch_request(symbols = "AAPL","FB","AMZN,"WDC", types = "quote,news")
-#'
-#' the content is accessed from res$content, user will need to reshape the data into dataframes based
-#' on the specifics of the data types requested
-#'
-#' @param symbol a market symbol or "market"
-#' @param types a comma separated list of data types to return such as quote,chart,news
-#' @param symbols if symbol is "market" then a commas separated list of market symbols. Max of 100 symbols in a request
-#' @param range if one of the types is chart, then the range parameter for the chart eq. 1d,1m,5y
-#' @param ... Parameters that are sent to individual endpoints can be specified in batch calls and will be applied to each supporting endpoint.
-#' @return a list, class iex_api, with keys of "status,content,url,iexcloud_messages_used,response
-#' @export
-batch_request <- function(symbol = "market", types = NULL, symbols = NULL, range = NULL, ...){
-  endpoint <- list()
-  class(endpoint)<-"url"
-  endpoint$path = glue::glue("/stock/{symbol}/batch");
-  endpoint$query <- list(types = types,
-                         symbols = symbols,
-                         range = range)
-  endpoint$query <- append(endpoint$query,list(...))
-  res <- iex_api(endpoint);
-}
-
 
 #' Pulls balance sheet data. Available quarterly (4 quarters) and annually (4 years)
 #'
@@ -341,7 +314,12 @@ fundOwnership <- function (symbol, lastN=1) {
 #'   This will only return IEX data with keys minute, high, low, average, volume, notional, and numberOfTrades
 #'
 #' @param symbol stock symbol
-#' @param timePeriod is one of "dynamic" | "date" | "1d" | "1m" | "3m" | "6m" | "ytd" | "1y" | "2y" | "5y"
+#' @param timePeriod is one of "dynamic" | "date" | "1d" | "5d" | "5dm" | "1m" | "1mm" | "3m" | "6m" | "ytd" | "1y" | "2y" | "5y | "max"
+#'
+#'     5dm returns five days at 10 minute intervals
+#'     1mm returns 1 month of data at 30 minute intervals
+#'     max returns up to 15 years of end of day data for symbol
+#'
 #' @param chartCloseOnly = FALSE,(1 mu/minute 50 max.) All ranges except 1d. Will return adjusted data only with keys date, close, and volume.
 #' @param chartIEXOnly = FALSE,(free) Only for 1d. Limits the return of intraday prices to IEX only data.
 #' @param chartLastN = 0, If passed, chart data will return the last N elements
@@ -349,6 +327,7 @@ fundOwnership <- function (symbol, lastN=1) {
 #' @param changeFromClose = FALSE, If true, changeOverTime and marketChangeOverTime will be relative to previous day close instead of the first value.
 #' @param chartReset = FALSE, If true, 1d chart will reset at midnight instead of the default behavior of 9:30am ET.
 #' @param chartSimplify = FALSE, If true, runs a polyline simplification using the Douglas-Peucker algorithm. This is useful if plotting sparkline charts.
+#' @param chartByDay = FALSE, if TRUE and timeperiod is dte then will return end of day info for given date instead of minute bars,
 #' @param date as "YYYY-MM-DD"| "YYYYMMDD" | class(date) == "Date"
 #' @return a dataframe
 #' @export
@@ -363,9 +342,10 @@ historyFor <- function (symbol,
                         changeFromClose = FALSE,
                         chartReset = FALSE,
                         chartSimplify = FALSE,
+                        chartByDay = FALSE,
                         date = "") {
   if (class(date) == "Date") {
-    date = format(date, "%Y%Om%d")
+    date = format(date, "%Y%m%d")
 
   }
   if (nchar(date) == 8 | nchar(date) == 10) {
@@ -382,13 +362,15 @@ historyFor <- function (symbol,
 
   }
   endpoint = paste0(endpoint, glue::glue('?chartCloseOnly={chartCloseOnly}'))
-
+  if (timePeriod == "date" && chartByDay) {
+    endpoint = paste0(endpoint, "&chartByDay=TRUE")
+  }
   if (chartLastN > 0) {
     endpoint <- paste0(endpoint, glue::glue('&chartLast=${chartLastN}'))
 
   }
   if ((timePeriod == "1d" | timePeriod == "date") & chartIEXOnly) {
-    endpoint <- paste0(endpoint, '&chartIEXOnly=true')
+    endpoint <- paste0(endpoint, '&chartIEXOnly=TRUE')
 
   }
   if (chartInterval > 1) {
@@ -397,20 +379,20 @@ historyFor <- function (symbol,
 
   }
   if (changeFromClose) {
-    endpoint <- paste0(endpoint, '&changeFromClose=true')
+    endpoint <- paste0(endpoint, '&changeFromClose=TRUE')
 
   }
   if (chartReset) {
-    endpoint <- paste0(endpoint, '&chartReset=true')
+    endpoint <- paste0(endpoint, '&chartReset=TRUE')
 
   }
   if (chartSimplify) {
-    endpoint <- paste0(endpoint, '&chartSimplify=true')
+    endpoint <- paste0(endpoint, '&chartSimplify=TRUE')
 
   }
   res = iex_api(endpoint)
 
-  if (res$status)
+  if (res$status || length(res$content)==0)
     return (tibble::as_tibble(list()))
   data <-
     lapply(res$content, function(x) {
@@ -424,7 +406,7 @@ historyFor <- function (symbol,
     tidyr::unnest() %>%
     dplyr::mutate_at(dplyr::vars(date), dplyr::funs(lubridate::ymd(.)))
 
-  if (timePeriod == "1d" | timePeriod == 'date') {
+  if (timePeriod == "1d" | timePeriod == "5dm" || timePeriod == "1mm" | (timePeriod == 'date' && !chartByDay)) {
     df <-
       dplyr::mutate(df, period = lubridate::period_to_seconds(lubridate::hm(minute))) %>%
       dplyr::mutate(dminute = (period - dplyr::first(period)) / 60) %>%
@@ -449,7 +431,7 @@ historyFor <- function (symbol,
 insiderTransactions <- function (symbol) {
   endpoint <- glue::glue('/stock/{symbol}/insider-transactions');
   res = iex_api(endpoint);
-  if (res$status) return (tibble::as_tibble(list()))
+  if (res$status || length(res$content)==0) return (tibble::as_tibble(list()))
   data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%

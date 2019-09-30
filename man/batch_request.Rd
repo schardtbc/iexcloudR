@@ -2,25 +2,12 @@
 % Please edit documentation in R/stock.service.R
 \name{batch_request}
 \alias{batch_request}
-\title{batch call endpoint}
+\title{batch calls to market}
 \usage{
-batch_request(symbol = "market", types = NULL, symbols = NULL,
-  range = NULL, ...)
-
 batch_request(symbol = "market", types = NULL, symbols = NULL,
   range = NULL, ...)
 }
 \arguments{
-\item{symbol}{a market symbol or "market"}
-
-\item{types}{a comma separated list of data types to return such as quote,chart,news}
-
-\item{symbols}{if symbol is "market" then a commas separated list of market symbols. Max of 100 symbols in a request}
-
-\item{range}{if one of the types is chart, then the range parameter for the chart eq. 1d,1m,5y}
-
-\item{...}{Parameters that are sent to individual endpoints can be specified in batch calls and will be applied to each supporting endpoint.}
-
 \item{symbol}{a market symbol or "market"}
 
 \item{types}{a comma separated list of data types to return such as quote,chart,news}
@@ -31,15 +18,6 @@ batch_request(symbol = "market", types = NULL, symbols = NULL,
 
 \item{...}{Parameters that are sent to individual endpoints can be specified in batch calls and will be applied to each supporting endpoint.}
 }
-\value{
-a list, class iex_api, with keys of "status,content,url,iexcloud_messages_used,response
-}
 \description{
-combines calls for multiple symbols and/or endpointd into a single request to the iex_api
-}
-\details{
-res <- batch_request(symbols = "AAPL","FB","AMZN,"WDC", types = "quote,news")
-
-the content is accessed from res$content, user will need to reshape the data into dataframes based
-on the specifics of the data types requested
+batch calls to market
 }

@@ -7,12 +7,15 @@
 historyFor(symbol, timePeriod = "1m", chartCloseOnly = FALSE,
   chartIEXOnly = FALSE, chartLastN = 0, chartInterval = 1,
   changeFromClose = FALSE, chartReset = FALSE, chartSimplify = FALSE,
-  date = "")
+  chartByDay = FALSE, date = "")
 }
 \arguments{
 \item{symbol}{stock symbol}
 
-\item{timePeriod}{is one of "dynamic" | "date" | "1d" | "1m" | "3m" | "6m" | "ytd" | "1y" | "2y" | "5y"}
+\item{timePeriod}{is one of "dynamic" | "date" | "1d" | "5d" | "5dm" | "1m" | "1mm" | "3m" | "6m" | "ytd" | "1y" | "2y" | "5y | "max"\preformatted{5dm returns five days at 10 minute intervals
+1mm returns 1 month of data at 30 minute intervals
+max returns up to 15 years of end of day data for symbol
+}}
 
 \item{chartCloseOnly}{= FALSE,(1 mu/minute 50 max.) All ranges except 1d. Will return adjusted data only with keys date, close, and volume.}
 
@@ -27,6 +30,8 @@ historyFor(symbol, timePeriod = "1m", chartCloseOnly = FALSE,
 \item{chartReset}{= FALSE, If true, 1d chart will reset at midnight instead of the default behavior of 9:30am ET.}
 
 \item{chartSimplify}{= FALSE, If true, runs a polyline simplification using the Douglas-Peucker algorithm. This is useful if plotting sparkline charts.}
+
+\item{chartByDay}{= FALSE, if TRUE and timeperiod is dte then will return end of day info for given date instead of minute bars,}
 
 \item{date}{as "YYYY-MM-DD"| "YYYYMMDD" | class(date) == "Date"}
 }
