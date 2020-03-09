@@ -17,11 +17,10 @@ Data Weighting: FREE
 
 Data Source(s): Investors Exchange
 }
-\examples{
-deepOfficialPrice('AAPL')\\
-}
 \seealso{
-Other deep service functions: \code{\link{deepAuction}},
-  \code{\link{deepTrades}}, \code{\link{deep}}
+Other deep service functions: 
+\code{\link{deepAuction}()},
+\code{\link{deepTrades}()},
+\code{\link{deep}()}
 }
 \concept{deep service functions}

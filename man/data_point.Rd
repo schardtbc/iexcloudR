@@ -15,6 +15,7 @@ data_point(symbol, key)
 data-point for symbol key
 }
 \seealso{
-Other data point service functions: \code{\link{data_point_keys}}
+Other data point service functions: 
+\code{\link{data_point_keys}()}
 }
 \concept{data point service functions}

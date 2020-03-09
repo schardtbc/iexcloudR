@@ -31,7 +31,7 @@
     return (tibble::as_tibble(list()))
   }
   tibble::as_tibble(do.call(rbind,res$content)) %>%
-    tidyr::unnest();
+    tidyr::unnest_legacy();
 }
 
   #' IEX Depth of Book
@@ -66,7 +66,7 @@
     return (tibble::as_tibble(list()))
   }
   tibble::as_tibble(do.call(rbind,res$content)) %>%
-    tidyr::unnest();
+    tidyr::unnest_legacy();
   }
 
   #' The Official Price message is used to disseminate the IEX Official Opening and Closing Prices.
@@ -90,7 +90,7 @@
     }
     data <- res$content[symbol];
     tibble::as_tibble(do.call(rbind,data)) %>%
-      tidyr::unnest();
+      tidyr::unnest_legacy();
   }
 
   #' Trade report messages are sent when an order on the IEX Order Book
@@ -114,7 +114,7 @@
     }
     data <- res$content[[symbol]];
     tibble::as_tibble(do.call(rbind,data)) %>%
-      tidyr::unnest() %>%
+      tidyr::unnest_legacy() %>%
       dplyr::mutate(datetime = lubridate::with_tz(lubridate::as_datetime(timestamp/1000),"America/New_York")) %>%
       dplyr::mutate(minute = lubridate::hour(datetime)*60+lubridate::minute(datetime)-570) %>%
       dplyr::arrange(desc(tradeId));

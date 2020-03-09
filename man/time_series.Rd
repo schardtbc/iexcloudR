@@ -4,8 +4,17 @@
 \alias{time_series}
 \title{return data for specified time series id}
 \usage{
-time_series(id, key = NULL, sub_key = NULL, from = NULL, to = NULL,
-  on = NULL, last = NULL, first = NULL, filter = NULL)
+time_series(
+  id,
+  key = NULL,
+  sub_key = NULL,
+  from = NULL,
+  to = NULL,
+  on = NULL,
+  last = NULL,
+  first = NULL,
+  filter = NULL
+)
 }
 \arguments{
 \item{from}{Optional
@@ -30,6 +39,7 @@ The standard filter parameter. Filters return data to the specified comma delimi
 return data for specified time series id
 }
 \seealso{
-Other time-series service: \code{\link{list_all_times_series}}
+Other time-series service: 
+\code{\link{list_all_times_series}()}
 }
 \concept{time-series service}

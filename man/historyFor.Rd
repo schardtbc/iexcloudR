@@ -4,10 +4,19 @@
 \alias{historyFor}
 \title{Retrieve history for a stock over chosen time-period as dataframe}
 \usage{
-historyFor(symbol, timePeriod = "1m", chartCloseOnly = FALSE,
-  chartIEXOnly = FALSE, chartLastN = 0, chartInterval = 1,
-  changeFromClose = FALSE, chartReset = FALSE, chartSimplify = FALSE,
-  chartByDay = FALSE, date = "")
+historyFor(
+  symbol,
+  timePeriod = "1m",
+  chartCloseOnly = FALSE,
+  chartIEXOnly = FALSE,
+  chartLastN = 0,
+  chartInterval = 1,
+  changeFromClose = FALSE,
+  chartReset = FALSE,
+  chartSimplify = FALSE,
+  chartByDay = FALSE,
+  date = ""
+)
 }
 \arguments{
 \item{symbol}{stock symbol}

@@ -22,7 +22,7 @@ listSymbols <- function (symbolType = "symbols") {
   if (res$status) {
     return (tibble::as_tibble(list()))
   }
-  tibble::as_tibble(do.call(rbind,res$content)) %>% tidyr::unnest()
+  tibble::as_tibble(do.call(rbind,res$content)) %>% tidyr::unnest_legacy()
 };
 
 #' dataframe of all symbols IEx supports for trading
@@ -34,7 +34,7 @@ iexSymbols <- function(){
   if (res$status) {
     return (tibble::as_tibble(list()))
   }
-  tibble::as_tibble(do.call(rbind,res$content)) %>% tidyr::unnest()
+  tibble::as_tibble(do.call(rbind,res$content)) %>% tidyr::unnest_legacy()
 }
 
 #' @export
@@ -44,7 +44,7 @@ iexExchanges <- function() {
   if (res$status) {
     return (tibble::as_tibble(list()))
   }
-  tibble::as_tibble(do.call(rbind,res$content)) %>% tidyr::unnest()
+  tibble::as_tibble(do.call(rbind,res$content)) %>% tidyr::unnest_legacy()
 }
 
 #' @export
@@ -54,7 +54,7 @@ regionSymbols <- function( region = "US"){
   if (!res$status) {
     return (tibble::as_tibble(list()))
   }
-  tibble::as_tibble(do.call(rbind,res$content)) %>% tidyr::unnest()
+  tibble::as_tibble(do.call(rbind,res$content)) %>% tidyr::unnest_legacy()
 }
 
 #' @export
@@ -62,5 +62,5 @@ allregionSymbols <- function() {
   ex <- iexExchanges();
   ex <- unique(ex$region)
   res <- lapply(ex,regionSymbols);
-  res %>% tibble::enframe() %>% tidyr::unnest()
+  res %>% tibble::enframe() %>% tidyr::unnest_legacy()
 }

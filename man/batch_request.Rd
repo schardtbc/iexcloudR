@@ -4,8 +4,13 @@
 \alias{batch_request}
 \title{batch calls to market}
 \usage{
-batch_request(symbol = "market", types = NULL, symbols = NULL,
-  range = NULL, ...)
+batch_request(
+  symbol = "market",
+  types = NULL,
+  symbols = NULL,
+  range = NULL,
+  ...
+)
 }
 \arguments{
 \item{symbol}{a market symbol or "market"}

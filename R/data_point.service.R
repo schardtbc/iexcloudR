@@ -9,7 +9,7 @@ data_point_keys <- function(symbol){
   res <-iex_api(endpoint)
   if (res$status) return (tibble::as_tibble(list()));
   tibble::as_tibble(do.call(rbind, res$content)) %>%
-    tidyr::unnest();
+    tidyr::unnest_legacy();
 }
 
 #' data-point for symbol key

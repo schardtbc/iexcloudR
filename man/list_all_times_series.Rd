@@ -10,6 +10,7 @@ list_all_times_series()
 return a data.frame with all the time series id and schema information
 }
 \seealso{
-Other time-series service: \code{\link{time_series}}
+Other time-series service: 
+\code{\link{time_series}()}
 }
 \concept{time-series service}

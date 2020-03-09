@@ -22,7 +22,7 @@ balanceSheet <- function (symbol,period = "quarter",lastN=1) {
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   result <- tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,period=period,.before=1) %>%
-    tidyr::unnest() %>%
+    tidyr::unnest_legacy() %>%
     dplyr::mutate_at(dplyr::vars(reportDate),dplyr::funs(as.Date(.)))
   } else {
     result <- tibble::as_tibble()
@@ -70,7 +70,7 @@ cashflowStatement <- function (symbol,period = "quarter",lastN=1) {
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   result <- tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,period=period,.before=1) %>%
-    tidyr::unnest() %>%
+    tidyr::unnest_legacy() %>%
     dplyr::mutate_at(dplyr::vars(reportDate),dplyr::funs(as.Date(.)))
   } else {
     result <- tibble::as_tibble();
@@ -98,7 +98,7 @@ company <- function (symbol) {
     })
 
     result <-
-      tibble::as_tibble(do.call(cbind, data)) %>% dplyr::select(-tags) %>% tidyr::unnest() %>% dplyr::distinct()
+      tibble::as_tibble(do.call(cbind, data)) %>% dplyr::select(-tags) %>% tidyr::unnest_legacy() %>% dplyr::distinct()
 
     if (length(res$tags) > 0) {
       result <-
@@ -156,7 +156,7 @@ dividends <- function (symbol, timePeriod = "3m") {
   data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
-    tidyr::unnest();
+    tidyr::unnest_legacy();
   } else {
     tibble::as_tibble(list());
   }
@@ -183,7 +183,7 @@ earnings <- function (symbol, lastN=1) {
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
-    tidyr::unnest();
+    tidyr::unnest_legacy();
 };
 
 #' Retrieve Earnings data for a given company including the actual EPS, consensus, and fiscal period.
@@ -202,9 +202,9 @@ earningsToday <- function (symbol, lastN=1) {
   res = iex_api(endpoint);
   if (res$status) return (tibble::as_tibble(list()))
   df <-lapply(res$content,function(o) (tibble::as_tibble(do.call(rbind,lapply(o,function(x) {x[["quote"]]<-NULL; x})))))
-  df <- tibble::enframe(df) %>% tidyr::unnest()
+  df <- tibble::enframe(df) %>% tidyr::unnest_legacy()
   df$consensusEPS <-as.numeric(unlist(df$consensusEPS))
-  df <- df %>% tidyr::unnest() %>% dplyr::select(-name)
+  df <- df %>% tidyr::unnest_legacy() %>% dplyr::select(-name)
   return (df)
 };
 
@@ -254,7 +254,7 @@ estimates <- function (symbol, lastN=1) {
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
-    tidyr::unnest();
+    tidyr::unnest_legacy();
 };
 
 #' Pulls income statement, balance sheet, and cash flow data from the most recent reported quarter.
@@ -275,7 +275,7 @@ financials <- function (symbol, lastN=1) {
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
-    tidyr::unnest();
+    tidyr::unnest_legacy();
 };
 
 #' Returns the top 10 fund holders,
@@ -297,7 +297,7 @@ fundOwnership <- function (symbol, lastN=1) {
   data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
-    tidyr::unnest() %>%
+    tidyr::unnest_legacy() %>%
     dplyr::mutate(report_date = lubridate::ymd(lubridate::as_datetime(report_date/1000)));
 };
 
@@ -403,7 +403,7 @@ historyFor <- function (symbol,
 
   df <- tibble::as_tibble(do.call(rbind, data)) %>%
     tibble::add_column(symbol = symbol, .before = 1) %>%
-    tidyr::unnest() %>%
+    tidyr::unnest_legacy() %>%
     dplyr::mutate_at(dplyr::vars(date), dplyr::funs(lubridate::ymd(.)))
 
   if (timePeriod == "1d" | timePeriod == "5dm" || timePeriod == "1mm" | (timePeriod == 'date' && !chartByDay)) {
@@ -418,6 +418,23 @@ historyFor <- function (symbol,
 
 }
 
+#' indicator
+#'
+#' Data Weighting 50 per indicator value + weight of chart data returned
+#' @param symbol a stock symbol
+#' @technicalIndicator
+#' @param range
+#' @export
+#' @examples
+#' indicator("AAPL","macd","6m")
+indicator <- function(symbol, technicalIndicator, range, ...) {
+  endpoint <- list()
+  class(endpoint)<-"url"
+  endpoint$path = glue::glue("/stock/{symbol}/indicator/{technicalIndicator}");
+  endpoint$query <- list(range = range);
+  endpoint$query <- append(endpoint$query,list(...))
+  res <- iex_api(endpoint);
+}
 
 #' Returns Insider Transactions
 #'
@@ -435,7 +452,7 @@ insiderTransactions <- function (symbol) {
   data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
-    tidyr::unnest() %>%
+    tidyr::unnest_legacy() %>%
     dplyr::mutate(effectiveDate = lubridate::ymd(lubridate::as_datetime(effectiveDate/1000)));
 };
 
@@ -458,7 +475,7 @@ insiderRoster <- function (symbol) {
   data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
-    tidyr::unnest() %>%
+    tidyr::unnest_legacy() %>%
   dplyr::mutate(reportDate = lubridate::ymd(lubridate::as_datetime(reportDate/1000)));
 };
 
@@ -477,7 +494,7 @@ insiderSummary <- function (symbol) {
   data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,.before=1) %>%
-    tidyr::unnest()
+    tidyr::unnest_legacy()
 
 };
 
@@ -504,7 +521,7 @@ incomeStatement <- function (symbol,period = "quarter",lastN=1) {
   data <- lapply(data,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y)})});
   result <-tibble::as_tibble(do.call(rbind,data)) %>%
     tibble::add_column(symbol = symbol,period=period,.before=1) %>%
-    tidyr::unnest() %>%
+    tidyr::unnest_legacy() %>%
     dplyr::mutate_at(dplyr::vars(reportDate),dplyr::funs(as.Date(.)))
   } else {
     result <- tibble::as_tibble();
@@ -579,7 +596,7 @@ listOf <- function (listType = "mostactive") {
   if (res$status) return (tibble::as_tibble(list()))
   data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
   tibble::as_tibble(do.call(rbind,data)) %>%
-    tidyr::unnest();
+    tidyr::unnest_legacy();
 };
 
 
@@ -607,7 +624,7 @@ marketVolume <- function () {
   res = iex_api(endpoint);
   if (res$status) return (tibble::as_tibble(list()))
   tibble::as_tibble(do.call(rbind,res$content)) %>%
-    tidyr::unnest();
+    tidyr::unnest_legacy();
 };
 
 #' Retrieve real time traded volume on U.S. markets.
@@ -628,7 +645,7 @@ newsFor <- function (subject,lastN = 5) {
   if (res$status || length(res$content) == 0) return (tibble::as_tibble(list()))
   result <-lapply(res$content, function(x) {x$symbol <- subject;tibble::as_tibble(x)}) %>%
      tibble::enframe() %>%
-     tidyr::unnest() %>%
+     tidyr::unnest_legacy() %>%
      dplyr::mutate(date = lubridate::as_datetime(datetime/1000.0)) %>%
      dplyr::select(-symbol) %>%
      tibble::add_column( symbol = subject,.before=1)
@@ -670,7 +687,7 @@ marketOpenClose <- function () {
                                                  )});
   symbols <- names(records);
   tibble::as_tibble(do.call(rbind,records)) %>%
-    tidyr::unnest() %>%
+    tidyr::unnest_legacy() %>%
     dplyr::mutate(openTime = lubridate::as_datetime(openTime/1000, tz = "America/New_York"),
                   closeTime = lubridate::as_datetime(closeTime/1000, tz = "America/New_York"),
                   gain = dplyr::case_when(
@@ -812,7 +829,7 @@ socialSentiment <- function (symbol, date, type="daily") {
     tibble::as_tibble(res$content)
   } else {
     tibble::as_tibble(do.call(rbind,res$content)) %>%
-      tidyr::unnest();
+      tidyr::unnest_legacy();
   }
 };
 
@@ -831,7 +848,7 @@ recommendationTrend <- function (symbol) {
   if (res$status) return (tibble::as_tibble(list()))
   data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
   tibble::as_tibble(do.call(rbind,data)) %>%
-    tidyr::unnest() %>%
+    tidyr::unnest_legacy() %>%
   dplyr::mutate(consensusEndDate = lubridate::ymd(lubridate::as_datetime(consensusEndDate/1000)),
                 consensusStartDate = lubridate::ymd(lubridate::as_datetime(consensusStartDate/1000)),
                 corporateActionsAppliedDate = lubridate::ymd(lubridate::as_datetime(corporateActionsAppliedDate/1000)));
@@ -866,7 +883,7 @@ splits <- function (symbol, period = "next") {
     })
 
   tibble::as_tibble(do.call(rbind, data)) %>%
-    tidyr::unnest()
+    tidyr::unnest_legacy()
 
 
 }
@@ -880,7 +897,7 @@ upcomingEarnings<- function(symbol = "market"){
   res = iex_api(endpoint)
   if (res$status) return (tibble::as_tibble(list()))
   tibble::as_tibble(do.call(rbind,res$content)) %>%
-    tidyr::unnest() %>% dplyr::arrange(symbol)
+    tidyr::unnest_legacy() %>% dplyr::arrange(symbol)
 }
 
 
@@ -905,7 +922,7 @@ volumeByVenue <- function(symbol) {
   if (res$status) return (tibble::as_tibble(list()))
   data <- lapply(res$content,function(x){ lapply(x, function(y) {ifelse(is.null(y),NA,y[[1]])})});
   tibble::as_tibble(do.call(rbind,data)) %>%
-    tidyr::unnest() %>%
+    tidyr::unnest_legacy() %>%
     tibble::add_column(symbol = symbol,.before=1);
 }
 

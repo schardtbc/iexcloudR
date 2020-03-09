@@ -34,7 +34,7 @@ tops <- function(symbol ="", securityType = NULL, sector = NULL) {
     return (tibble::as_tibble(list()))
   }
   result <-tibble::as_tibble(do.call(rbind,res$content)) %>%
-    tidyr::unnest()
+    tidyr::unnest_legacy()
   if (nchar(symbol)==0) {
     result <- dplyr::filter(result,!(lastSaleTime== 0 & bidPrice == 0 & askPrice == 0 ));
   }
@@ -85,7 +85,7 @@ topsLast <- function(symbol="") {
     return (tibble::as_tibble(list()))
   }
   result <-tibble::as_tibble(do.call(rbind,res$content)) %>%
-    tidyr::unnest() %>%
+    tidyr::unnest_legacy() %>%
     dplyr::mutate(
       time = lubridate::with_tz(lubridate::as_datetime(time/1000),"America/New_York"),
       minute = lubridate::hour(time)*60+lubridate::minute(time)-570) %>%
