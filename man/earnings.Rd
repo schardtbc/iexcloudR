@@ -5,10 +5,12 @@
 \title{Retrieve Earnings data for a given company including the actual EPS, consensus, and fiscal period.
 Earnings are available quarterly (last 4 quarters) and annually (last 4 years).}
 \usage{
-earnings(symbol, lastN = 1)
+earnings(symbol, period = "quarter", lastN = 1)
 }
 \arguments{
 \item{symbol}{stock symbol}
+
+\item{period}{period to pull earnings from (annual/quarter)}
 
 \item{lastN}{(1) number of periods to report}
 }
@@ -22,5 +24,5 @@ Data Weighting: 1000 mesaage units per symbol per period
 Data Schedule: Updates at 9am, 11am, 12pm UTC every da
 }
 \examples{
-earnings("AAPL", lastN =4)
+earnings("AAPL", "annual", lastN =4)
 }

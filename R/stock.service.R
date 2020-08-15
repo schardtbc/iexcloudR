@@ -171,12 +171,13 @@ dividends <- function (symbol, timePeriod = "3m") {
 #'
 #' @param symbol stock symbol
 #' @param lastN (1) number of periods to report
+#' @param period period to pull earnings from (annual/quarter)
 #' @return a dataframe
 #' @export
 #' @examples
-#' earnings("AAPL", lastN =4)
-earnings <- function (symbol, lastN=1) {
-  endpoint <- glue::glue('/stock/{symbol}/earnings/{lastN}/');
+#' earnings("AAPL", "annual", lastN =4)
+earnings <- function (symbol, period = "quarter", lastN=1) {
+  endpoint <- glue::glue('/stock/{symbol}/earnings/{lastN}?period={period}');
   res = iex_api(endpoint);
   if (res$status) return (tibble::as_tibble(list()))
   data <- res$content$earnings
